@@ -1,0 +1,101 @@
+/* Element UI overrides: modern, softer, consistent */
+:root{
+  --el-primary: var(--primary);
+}
+
+/* Card */
+.el-card{
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.el-card__body{
+  padding: 16px;
+}
+
+/* Button */
+.el-button{
+  border-radius: 10px;
+  font-weight: 600;
+}
+.el-button--primary{
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+  border: none;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, .18);
+}
+.el-button--primary:hover,
+.el-button--primary:focus{
+  filter: brightness(1.02);
+}
+
+/* Input */
+.el-input__inner,
+.el-textarea__inner{
+  border-radius: 12px;
+  border-color: rgba(15, 23, 42, .14);
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.el-input__inner:focus,
+.el-textarea__inner:focus{
+  border-color: rgba(37, 99, 235, .55);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .14);
+}
+
+/* Dialog */
+.el-dialog{
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.el-dialog__header{
+  padding: 16px 18px 10px;
+}
+.el-dialog__title{
+  font-weight: 700;
+  color: var(--text);
+}
+.el-dialog__body{
+  padding: 14px 18px 18px;
+}
+
+/* Table */
+.el-table{
+  border-radius: 14px;
+  overflow: hidden;
+}
+.el-table th{
+  background: rgba(15, 23, 42, .04);
+  color: var(--text-2);
+  font-weight: 700;
+}
+.el-table--border, .el-table--group{
+  border: 1px solid var(--border);
+}
+.el-table td, .el-table th.is-leaf{
+  border-bottom: 1px solid rgba(15, 23, 42, .08);
+}
+
+/* Form */
+.el-form-item__label{
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+/* Message */
+.el-message{
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Menu (sidebar) */
+.el-menu{
+  border-right: none;
+}
+.el-menu-item, .el-submenu__title{
+  border-radius: 12px;
+  margin: 6px 10px;
+}
+.el-menu-item.is-active{
+  background: rgba(37, 99, 235, .12) !important;
+  color: var(--primary) !important;
+}

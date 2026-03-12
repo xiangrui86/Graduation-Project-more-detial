@@ -1,0 +1,90 @@
+<template>
+  <div class="app-shell">
+    <div class="container surface shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="mark" />
+          <div class="meta">
+            <div class="title">Sports Mall</div>
+            <div class="sub">管理后台</div>
+          </div>
+        </div>
+        <div class="actions">
+          <el-button size="small" type="primary" @click="logout">退出登录</el-button>
+        </div>
+      </header>
+
+      <div class="body">
+        <aside class="aside">
+          <el-menu :default-active="$route.path" router class="menu">
+            <el-menu-item index="/admin">数据报表</el-menu-item>
+            <el-menu-item index="/admin/users">用户管理</el-menu-item>
+            <el-menu-item index="/admin/merchants">商家管理</el-menu-item>
+            <el-menu-item index="/admin/categories">分类管理</el-menu-item>
+            <el-menu-item index="/admin/products">商品管理</el-menu-item>
+            <el-menu-item index="/admin/orders">交易管理</el-menu-item>
+            <el-menu-item index="/admin/news">资讯管理</el-menu-item>
+          </el-menu>
+        </aside>
+
+        <main class="main page">
+          <router-view />
+        </main>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'AdminLayout',
+  methods: {
+    logout() {
+      this.$store.dispatch('logout')
+      this.$router.push('/login')
+    }
+  }
+}
+</script>
+
+<style scoped>
+.shell{ overflow: hidden; }
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(255,255,255,.70);
+  backdrop-filter: blur(14px);
+}
+.brand{ display:flex; align-items:center; gap: 10px; }
+.mark{
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb 0%, #ef4444 100%);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, .18);
+}
+.meta{ line-height: 1.1; }
+.title{ font-weight: 900; letter-spacing: .2px; }
+.sub{ font-size: 12px; color: rgba(15,23,42,.62); margin-top: 2px; }
+
+.body{
+  display:flex;
+  min-height: calc(100vh - 18px*2 - 60px);
+}
+.aside{
+  width: 240px;
+  padding: 14px 10px;
+  border-right: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(255,255,255,.55);
+}
+.menu{
+  background: transparent;
+}
+.main{
+  flex: 1;
+  min-width: 0;
+}
+</style>
