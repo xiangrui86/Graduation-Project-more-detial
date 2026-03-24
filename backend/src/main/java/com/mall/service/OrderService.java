@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+/** 订单服务：负责下单、查询、状态流转与退款申请。 */
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -28,6 +29,7 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
 
+    /** 按商家从购物车创建订单，并扣减库存。 */
     @Transactional
     public Order createFromCart(Long userId, Long merchantId, String receiverName, String receiverPhone, String receiverAddress) {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
@@ -79,30 +81,52 @@ public class OrderService {
         return order;
     }
 
+    /** 根据订单 ID 查询订单。 */
     public Optional<Order> getById(Long id) {
         return orderRepository.findById(id);
     }
 
+    /** 分页查询用户订单。 */
     public Page<Order> findByUser(Long userId, Pageable pageable) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
 
+    /** 分页查询商家订单。 */
     public Page<Order> findByMerchant(Long merchantId, Pageable pageable) {
         return orderRepository.findByMerchantIdOrderByCreatedAtDesc(merchantId, pageable);
     }
 
+    /** 分页查询全站订单。 */
     public Page<Order> findAll(Pageable pageable) {
         return orderRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
+    /** 查询订单明细项。 */
     public List<OrderItem> getItems(Long orderId) {
         return orderItemRepository.findByOrderId(orderId);
     }
 
+    /** 更新订单状态。 */
     @Transactional
     public void updateStatus(Long orderId, String status) {
         Order o = orderRepository.findById(orderId).orElseThrow();
         o.setStatus(status);
+        orderRepository.save(o);
+    }
+
+    /**
+     * 用户申请退货/退款（简化流程）：仅允许对已收货订单发起申请。
+     */
+    @Transactional
+    public void requestRefund(Long orderId, Long userId, String reason) {
+        Order o = orderRepository.findById(orderId).orElseThrow();
+        if (!o.getUserId().equals(userId)) throw new RuntimeException("订单不存在");
+        if (!"RECEIVED".equals(o.getStatus())) throw new RuntimeException("当前订单状态不可退货");
+        if (reason != null && reason.length() > 256) reason = reason.substring(0, 256);
+
+        o.setStatus("REFUND_REQUESTED");
+        o.setRefundReason(reason);
+        o.setRefundRequestTime(LocalDateTime.now());
         orderRepository.save(o);
     }
 }

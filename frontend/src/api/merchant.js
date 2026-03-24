@@ -1,53 +1,66 @@
 import request from "./request";
 
+/**
+ * 商家端接口集合
+ * 覆盖店铺看板、商品管理、订单履约和图片上传能力。
+ */
+
+/** 获取商家看板数据 */
 export function getReport() {
   return request.get("/merchant/report/dashboard");
 }
 
+/** 查询商家商品列表 */
 export function getProducts(params) {
   return request.get("/merchant/product", { params });
 }
 
+/** 查询商品详情 */
 export function getProduct(id) {
   return request.get(`/merchant/product/${id}`);
 }
 
+/** 新增商品 */
 export function createProduct(data) {
   return request.post("/merchant/product", data);
 }
 
+/** 更新商品 */
 export function updateProduct(id, data) {
   return request.put(`/merchant/product/${id}`, data);
 }
 
+/** 删除商品 */
 export function deleteProduct(id) {
   return request.delete(`/merchant/product/${id}`);
 }
 
+/** 查询订单列表 */
 export function getOrders(params) {
   return request.get("/merchant/order", { params });
 }
 
+/** 查询订单详情 */
 export function getOrderDetail(id) {
   return request.get(`/merchant/order/${id}`);
 }
 
+/** 订单发货 */
 export function shipOrder(id) {
   return request.post(`/merchant/order/${id}/ship`);
 }
 
-export function getChatList(userId) {
-  return request.get("/merchant/chat/list", { params: { userId } });
+/** 同意退款 */
+export function acceptRefund(id) {
+  return request.post(`/merchant/order/${id}/accept-refund`);
 }
 
-export function sendChat(data) {
-  return request.post("/merchant/chat/send", data);
-}
-
+/** 获取可选图片列表 */
 export function listImages() {
   return request.get("/pub/images/list");
 }
 
+/** 上传商品图片 */
 export function uploadImage(file) {
   const formData = new FormData();
   formData.append("file", file);

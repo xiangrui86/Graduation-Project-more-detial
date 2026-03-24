@@ -53,6 +53,16 @@ public class Order {
     @Column(name = "receiver_address", length = 256)
     private String receiverAddress;
 
+    /** 退货/退款状态说明：
+     * REFUND_REQUESTED-已申请退货(退款)
+     * REFUNDED-已退款
+     */
+    @Column(name = "refund_reason", length = 256)
+    private String refundReason;
+
+    @Column(name = "refund_request_time")
+    private LocalDateTime refundRequestTime;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

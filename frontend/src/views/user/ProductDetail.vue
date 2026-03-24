@@ -30,7 +30,6 @@
           <div class="actions">
             <el-button type="primary" @click="addCart">加入购物车</el-button>
             <el-button @click="addFavorite">收藏</el-button>
-            <el-button @click="goChat" type="info">联系客服</el-button>
           </div>
         </div>
       </el-col>
@@ -52,7 +51,12 @@
     <el-button v-if="canReview" type="text" @click="showReviewDialog = true"
       >我要评价</el-button
     >
-    <el-dialog title="评价" :visible.sync="showReviewDialog" width="420px">
+    <el-dialog
+      title="评价"
+      :visible.sync="showReviewDialog"
+      width="420px"
+      append-to-body
+    >
       <el-form :model="reviewForm" label-width="80px">
         <el-form-item label="评分">
           <el-rate v-model="reviewForm.rating" />
@@ -109,7 +113,7 @@ export default {
         (res) => {
           if (res.code === 200) this.$message.success("已加入购物车");
           else this.$message.error(res.message || "失败");
-        },
+        }
       );
     },
     addFavorite() {
@@ -121,9 +125,6 @@ export default {
         if (res.code === 200) this.$message.success("已收藏");
         else this.$message.error(res.message || "失败");
       });
-    },
-    goChat() {
-      this.$router.push("/chat");
     },
     submitReview() {
       addReview({

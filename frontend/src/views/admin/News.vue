@@ -5,8 +5,11 @@
       <span class="sub">公告/资讯编辑与发布</span>
     </div>
 
-    <div style="display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px">
       <el-button type="primary" @click="openCreateDialog">新增资讯</el-button>
+      <el-button type="success" @click="openAnnouncementDialog"
+        >发布公告</el-button
+      >
     </div>
 
     <el-table :data="list" border>
@@ -37,6 +40,7 @@
       :title="isEdit ? '编辑资讯' : '新增资讯'"
       :visible.sync="dialogVisible"
       width="600px"
+      append-to-body
     >
       <el-form :model="form" label-width="100px">
         <el-form-item label="标题">
@@ -57,11 +61,41 @@
         <el-button type="primary" @click="submitForm">提交</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      :title="'发布公告'"
+      :visible.sync="announcementVisible"
+      width="600px"
+      append-to-body
+    >
+      <el-form :model="announcementForm" label-width="100px">
+        <el-form-item label="标题">
+          <el-input v-model="announcementForm.title" />
+        </el-form-item>
+        <el-form-item label="内容">
+          <el-input
+            v-model="announcementForm.content"
+            type="textarea"
+            rows="6"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="announcementVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitAnnouncement">发布</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getNews, createNews, updateNews, deleteNews } from "@/api/admin";
+import {
+  getNews,
+  createNews,
+  updateNews,
+  deleteNews,
+  createAnnouncement,
+} from "@/api/admin";
 
 export default {
   name: "AdminNews",
@@ -71,6 +105,8 @@ export default {
       dialogVisible: false,
       isEdit: false,
       form: { title: "", content: "", type: "", published: false },
+      announcementVisible: false,
+      announcementForm: { title: "", content: "" },
     };
   },
   created() {
@@ -87,9 +123,20 @@ export default {
       this.form = { title: "", content: "", type: "", published: false };
       this.dialogVisible = true;
     },
+    openAnnouncementDialog() {
+      this.announcementForm = { title: "", content: "" };
+      this.announcementVisible = true;
+    },
     openEditDialog(row) {
       this.isEdit = true;
-      this.form = { ...row };
+      // 只拷贝接口需要的字段，避免把多余字段一并提交
+      this.form = {
+        id: row.id,
+        title: row.title,
+        content: row.content,
+        type: row.type,
+        published: row.published,
+      };
       this.dialogVisible = true;
     },
     submitForm() {
@@ -106,6 +153,22 @@ export default {
           this.loadNews();
         } else {
           this.$message.error(res.message || "操作失败");
+        }
+      });
+    },
+    submitAnnouncement() {
+      const f = this.announcementForm;
+      if (!f.title || !f.content) {
+        this.$message.warning("请填写标题和内容");
+        return;
+      }
+      createAnnouncement(f).then((res) => {
+        if (res.code === 200) {
+          this.$message.success("公告发布成功");
+          this.announcementVisible = false;
+          this.loadNews();
+        } else {
+          this.$message.error(res.message || "公告发布失败");
         }
       });
     },

@@ -14,14 +14,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user/review")
 @RequiredArgsConstructor
+/** 用户评价接口：提交商品评价。 */
 public class UserReviewController {
 
     private final ProductReviewRepository productReviewRepository;
 
+    /** 获取当前登录用户 ID。 */
     private Long currentUserId(Authentication auth) {
         return (Long) auth.getPrincipal();
     }
 
+    /** 新增商品评价。 */
     @PostMapping
     public ResponseEntity<Result<?>> add(Authentication auth, @RequestBody Map<String, Object> body) {
         Long productId = Long.valueOf(body.get("productId").toString());

@@ -16,12 +16,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/report")
 @RequiredArgsConstructor
+/** 管理端报表接口：提供后台首页统计指标。 */
 public class AdminReportController {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
+    /** 后台看板数据：用户数、商品数、订单数。 */
     @GetMapping("/dashboard")
     public ResponseEntity<Result<?>> dashboard() {
         Map<String, Object> data = new HashMap<>();

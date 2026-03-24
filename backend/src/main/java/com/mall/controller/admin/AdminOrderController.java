@@ -17,10 +17,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/admin/order")
 @RequiredArgsConstructor
+/** 管理端订单接口：订单列表与订单详情查询。 */
 public class AdminOrderController {
 
     private final OrderService orderService;
 
+    /** 分页查询全站订单。 */
     @GetMapping
     public ResponseEntity<Result<?>> list(
             @RequestParam(defaultValue = "0") int page,
@@ -28,6 +30,7 @@ public class AdminOrderController {
         return ResponseEntity.ok(Result.ok(orderService.findAll(PageRequest.of(page, size))));
     }
 
+    /** 查询订单详情（含订单项）。 */
     @GetMapping("/{id}")
     public ResponseEntity<Result<?>> detail(@PathVariable Long id) {
         Optional<Order> order = orderService.getById(id);

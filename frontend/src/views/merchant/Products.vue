@@ -58,13 +58,22 @@
           />
         </el-form-item>
         <el-form-item label="分类">
-          <el-select v-model="form.categoryId" placeholder="选择分类">
-            <el-option label="足球用品" :value="1" />
-            <el-option label="篮球用品" :value="2" />
-            <el-option label="健身器材" :value="3" />
-            <el-option label="羽毛球用品" :value="4" />
-            <el-option label="乒乓球用品" :value="5" />
+          <el-select
+            v-model="form.categoryId"
+            placeholder="选择分类"
+            filterable
+            clearable
+            class="category-select"
+            @visible-change="(v) => v && !categories.length && loadCategories()"
+          >
+            <el-option
+              v-for="c in categories"
+              :key="c.id"
+              :label="c.name"
+              :value="c.id"
+            />
           </el-select>
+          <div class="hint">没有合适的分类？可在下一项填写“自定义分类”</div>
         </el-form-item>
         <el-form-item label="自定义分类">
           <el-input
@@ -161,6 +170,7 @@ import {
   listImages,
   uploadImage,
 } from "@/api/merchant";
+import { getAllCategories } from "@/api/pub";
 
 export default {
   name: "MerchantProducts",
@@ -168,13 +178,14 @@ export default {
     return {
       list: [],
       imageList: [],
+      categories: [],
       showCreateDialog: false,
       editingId: null,
       saving: false,
       form: {
         name: "",
         description: "",
-        categoryId: 1,
+        categoryId: null,
         categoryName: "",
         price: 0,
         originalPrice: 0,
@@ -186,9 +197,19 @@ export default {
     };
   },
   created() {
+    this.loadCategories();
     this.loadProducts();
   },
   methods: {
+    loadCategories() {
+      getAllCategories()
+        .then((res) => {
+          if (Array.isArray(res.data)) this.categories = res.data;
+          else if (res.data && Array.isArray(res.data.content))
+            this.categories = res.data.content;
+        })
+        .catch(() => {});
+    },
     loadProducts() {
       getProducts({ page: 0, size: 50 })
         .then((res) => {
@@ -199,6 +220,7 @@ export default {
     editProduct(product) {
       this.editingId = product.id;
       this.form = { ...product };
+      if (!this.categories.length) this.loadCategories();
       this.showCreateDialog = true;
     },
     async saveProduct() {
@@ -208,6 +230,10 @@ export default {
       }
       if (!this.form.image) {
         this.$message.error("请输入图片URL");
+        return;
+      }
+      if (!this.form.categoryId && !String(this.form.categoryName || "").trim()) {
+        this.$message.error("请选择分类或填写自定义分类");
         return;
       }
       this.saving = true;
@@ -248,7 +274,7 @@ export default {
       this.form = {
         name: "",
         description: "",
-        categoryId: 1,
+        categoryId: null,
         categoryName: "",
         price: 0,
         originalPrice: 0,
@@ -282,3 +308,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.category-select{
+  width: 100%;
+}
+.hint{
+  font-size: 12px;
+  color: rgba(15,23,42,.55);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+</style>

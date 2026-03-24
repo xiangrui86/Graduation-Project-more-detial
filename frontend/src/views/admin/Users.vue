@@ -5,7 +5,7 @@
       <span class="sub">新增、编辑、启用状态管理</span>
     </div>
 
-    <div style="display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px">
       <el-button type="primary" @click="openCreateDialog">新增用户</el-button>
     </div>
 
@@ -37,6 +37,7 @@
       :title="isEdit ? '编辑用户' : '新增用户'"
       :visible.sync="dialogVisible"
       width="500px"
+      append-to-body
     >
       <el-form :model="form" label-width="100px">
         <el-form-item label="用户名">

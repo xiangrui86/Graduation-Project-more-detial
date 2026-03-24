@@ -16,15 +16,18 @@ import java.util.Map;
 @RestController
 @RequestMapping("/merchant/chat")
 @RequiredArgsConstructor
+/** 商家客服聊天接口：会话查询与消息发送。 */
 public class MerchantChatController {
 
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
 
+    /** 获取当前登录商家账号 ID。 */
     private Long currentMerchantUserId(Authentication auth) {
         return (Long) auth.getPrincipal();
     }
 
+    /** 拉取商家与指定用户的聊天记录。 */
     @GetMapping("/list")
     public ResponseEntity<Result<?>> list(Authentication auth, @RequestParam Long userId) {
         Long merchantUserId = currentMerchantUserId(auth);
@@ -36,6 +39,7 @@ public class MerchantChatController {
         return ResponseEntity.ok(Result.ok(list));
     }
 
+    /** 商家发送聊天消息给用户。 */
     @PostMapping("/send")
     public ResponseEntity<Result<?>> send(Authentication auth, @RequestBody Map<String, Object> body) {
         Long receiverId = Long.valueOf(body.get("receiverId").toString());

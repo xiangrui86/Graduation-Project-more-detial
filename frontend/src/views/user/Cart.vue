@@ -35,6 +35,7 @@
             :min="1"
             size="small"
             @change="(v) => updateQty(scope.row.productId, v)"
+            style="width: 90px; min-width: 90px"
           />
         </template>
       </el-table-column>
@@ -49,19 +50,30 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button
-      v-if="items.length"
-      type="primary"
-      style="margin-top: 12px"
-      @click="showCheckout = true"
-      >去结算</el-button
-    >
+
+    <div v-if="items.length" class="summary">
+      <div class="left">
+        <span class="muted">商品总价</span>
+        <span class="total">¥ {{ totalPrice.toFixed(2) }}</span>
+      </div>
+      <el-button type="primary" @click="showCheckout = true">去结算</el-button>
+    </div>
     <p v-if="!items.length">
       购物车为空，<router-link to="/products">去逛逛</router-link>
     </p>
 
-    <el-dialog title="确认订单" :visible.sync="showCheckout" width="500px">
+    <el-dialog
+      title="确认订单"
+      :visible.sync="showCheckout"
+      width="500px"
+      :style="{ maxHeight: '70vh', overflow: 'auto', zIndex: 3000 }"
+      append-to-body
+      class="custom-dialog"
+    >
       <el-form :model="checkoutForm" label-width="100px">
+        <el-form-item label="商品总价">
+          <div class="checkout-total">¥ {{ totalPrice.toFixed(2) }}</div>
+        </el-form-item>
         <el-form-item label="商家ID">
           <el-input-number
             v-model="checkoutForm.merchantId"
@@ -121,6 +133,16 @@ export default {
       },
     };
   },
+  computed: {
+    totalPrice() {
+      return (this.items || []).reduce((sum, item) => {
+        const p = this.productMap && this.productMap[item.productId];
+        const unit = Number(p && p.price) || 0;
+        const qty = Number(item.quantity) || 0;
+        return sum + unit * qty;
+      }, 0);
+    },
+  },
   created() {
     this.load();
   },
@@ -178,3 +200,41 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.summary{
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(255,255,255,.60);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.summary .left{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.total{
+  font-weight: 900;
+  font-size: 18px;
+  color: #ef4444;
+  letter-spacing: .2px;
+}
+.checkout-total{
+  font-weight: 900;
+  color: #ef4444;
+  letter-spacing: .2px;
+}
+
+.custom-dialog >>> .el-dialog__wrapper {
+  background: rgba(0, 0, 0, 0.2) !important;
+  z-index: 3000 !important;
+}
+.custom-dialog >>> .el-dialog {
+  z-index: 3001 !important;
+}
+</style>

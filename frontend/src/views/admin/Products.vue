@@ -37,6 +37,7 @@
       :title="isEdit ? '编辑商品' : '编辑商品信息'"
       :visible.sync="dialogVisible"
       width="600px"
+      append-to-body
     >
       <el-form :model="form" label-width="100px">
         <el-form-item label="名称">

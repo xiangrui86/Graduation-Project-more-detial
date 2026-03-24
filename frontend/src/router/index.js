@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
+// 路由表：按用户、管理员、商家三类角色划分
 const routes = [
   {
     path: "/login",
@@ -144,11 +145,6 @@ const routes = [
         name: "MerchantOrders",
         component: () => import("@/views/merchant/Orders.vue"),
       },
-      {
-        path: "chat",
-        name: "MerchantChat",
-        component: () => import("@/views/merchant/Chat.vue"),
-      },
     ],
   },
 ];
@@ -159,6 +155,7 @@ const router = new VueRouter({
   routes,
 });
 
+// 全局前置守卫：处理登录态校验与角色路由权限
 router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   if (to.meta.guest) {

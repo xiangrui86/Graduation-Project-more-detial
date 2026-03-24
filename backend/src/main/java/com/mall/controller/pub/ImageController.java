@@ -16,6 +16,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/pub/images")
 @RequiredArgsConstructor
+/** 公共图片接口：图片列表查询与图片上传。 */
 public class ImageController {
 
     @Value("${file.upload.path:src/main/resources/static/images}")

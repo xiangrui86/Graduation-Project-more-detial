@@ -18,15 +18,18 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/user/order")
 @RequiredArgsConstructor
+/** 用户订单接口：下单、查询、支付、收货与退款申请。 */
 public class UserOrderController {
 
     private final OrderService orderService;
     private final PaymentService paymentService;
 
+    /** 获取当前登录用户 ID。 */
     private Long currentUserId(Authentication auth) {
         return (Long) auth.getPrincipal();
     }
 
+    /** 从购物车创建订单。 */
     @PostMapping("/create")
     public Result<?> create(Authentication auth, @RequestBody Map<String, Object> body) {
         Long merchantId = Long.valueOf(body.get("merchantId").toString());
@@ -44,6 +47,7 @@ public class UserOrderController {
         }
     }
 
+    /** 分页查询我的订单。 */
     @GetMapping
     public Result<?> myOrders(
             Authentication auth,
@@ -52,6 +56,7 @@ public class UserOrderController {
         return Result.ok(orderService.findByUser(currentUserId(auth), PageRequest.of(page, size)));
     }
 
+    /** 查询订单详情（含订单项）。 */
     @GetMapping("/{id}")
     public Result<?> detail(Authentication auth, @PathVariable Long id) {
         Optional<Order> order = orderService.getById(id);
@@ -72,6 +77,7 @@ public class UserOrderController {
         return ok ? Result.ok(null) : Result.fail("支付失败");
     }
 
+    /** 用户确认收货。 */
     @PostMapping("/{id}/confirm-receive")
     public Result<?> confirmReceive(Authentication auth, @PathVariable Long id) {
         Optional<Order> o = orderService.getById(id);
@@ -79,6 +85,14 @@ public class UserOrderController {
             return Result.fail("订单不存在");
         }
         orderService.updateStatus(id, "RECEIVED");
+        return Result.ok(null);
+    }
+
+    /** 申请退货/退款（简化流程） */
+    @PostMapping("/{id}/refund-request")
+    public Result<?> refundRequest(Authentication auth, @PathVariable Long id, @RequestBody(required = false) Map<String, Object> body) {
+        String reason = body == null ? null : (String) body.get("reason");
+        orderService.requestRefund(id, currentUserId(auth), reason);
         return Result.ok(null);
     }
 }

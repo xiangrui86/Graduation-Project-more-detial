@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/pub")
 @RequiredArgsConstructor
+/** 公共评价接口：按商品分页查询评价列表。 */
 public class PubReviewController {
 
     private final ProductReviewRepository productReviewRepository;
 
+    /** 查询商品评价列表。 */
     @GetMapping("/reviews")
     public ResponseEntity<Result<?>> list(
             @RequestParam Long productId,

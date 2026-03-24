@@ -20,11 +20,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/merchant/order")
 @RequiredArgsConstructor
+/** 商家端订单接口：订单查询、发货与退款处理。 */
 public class MerchantOrderController {
 
     private final OrderService orderService;
     private final UserRepository userRepository;
 
+    /** 从当前登录账号解析所属商家 ID。 */
     private Long currentMerchantId(Authentication auth) {
         Long userId = (Long) auth.getPrincipal();
         User u = userRepository.findById(userId).orElseThrow();
@@ -32,6 +34,7 @@ public class MerchantOrderController {
         return u.getMerchantId();
     }
 
+    /** 分页查询当前商家的订单列表。 */
     @GetMapping
     public ResponseEntity<Result<?>> list(
             Authentication auth,
@@ -41,6 +44,7 @@ public class MerchantOrderController {
                 orderService.findByMerchant(currentMerchantId(auth), PageRequest.of(page, size))));
     }
 
+    /** 查询订单详情（含订单项）。 */
     @GetMapping("/{id}")
     public ResponseEntity<Result<?>> detail(Authentication auth, @PathVariable Long id) {
         Optional<Order> order = orderService.getById(id);
@@ -54,6 +58,7 @@ public class MerchantOrderController {
         return ResponseEntity.ok(Result.ok(data));
     }
 
+    /** 商家发货：仅允许已支付订单。 */
     @PostMapping("/{id}/ship")
     public ResponseEntity<Result<?>> ship(Authentication auth, @PathVariable Long id) {
         Optional<Order> o = orderService.getById(id);
@@ -62,6 +67,20 @@ public class MerchantOrderController {
         }
         if (!"PAID".equals(o.get().getStatus())) return ResponseEntity.ok(Result.fail("订单未支付"));
         orderService.updateStatus(id, "SHIPPED");
+        return ResponseEntity.ok(Result.ok(null));
+    }
+
+    /** 同意退款：仅处理退款申请中的订单。 */
+    @PostMapping("/{id}/accept-refund")
+    public ResponseEntity<Result<?>> acceptRefund(Authentication auth, @PathVariable Long id) {
+        Optional<Order> o = orderService.getById(id);
+        if (o.isEmpty() || !o.get().getMerchantId().equals(currentMerchantId(auth))) {
+            return ResponseEntity.ok(Result.fail("订单不存在"));
+        }
+        if (!"REFUND_REQUESTED".equals(o.get().getStatus())) {
+            return ResponseEntity.ok(Result.fail("订单不在退货申请状态"));
+        }
+        orderService.updateStatus(id, "REFUNDED");
         return ResponseEntity.ok(Result.ok(null));
     }
 }

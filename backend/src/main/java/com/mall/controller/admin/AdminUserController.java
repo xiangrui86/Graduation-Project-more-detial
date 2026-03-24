@@ -17,11 +17,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/admin/user")
 @RequiredArgsConstructor
+/** 管理端用户接口：用户查询、创建、更新与删除。 */
 public class AdminUserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /** 分页查询用户，支持按角色过滤。 */
     @GetMapping
     public ResponseEntity<Result<?>> list(
             @RequestParam(required = false) Role role,
@@ -33,6 +35,7 @@ public class AdminUserController {
         return ResponseEntity.ok(Result.ok(userRepository.findAll(PageRequest.of(page, size))));
     }
 
+    /** 创建用户账号（密码加密后保存）。 */
     @PostMapping
     public ResponseEntity<Result<?>> create(@RequestBody Map<String, Object> body) {
         String username = (String) body.get("username");
@@ -55,6 +58,7 @@ public class AdminUserController {
         return ResponseEntity.ok(Result.ok(u));
     }
 
+    /** 更新用户基础信息（昵称、状态、商家绑定）。 */
     @PutMapping("/{id}")
     public ResponseEntity<Result<?>> update(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Optional<User> opt = userRepository.findById(id);
@@ -67,6 +71,7 @@ public class AdminUserController {
         return ResponseEntity.ok(Result.ok(u));
     }
 
+    /** 删除用户。 */
     @DeleteMapping("/{id}")
     public ResponseEntity<Result<?>> delete(@PathVariable Long id) {
         userRepository.deleteById(id);

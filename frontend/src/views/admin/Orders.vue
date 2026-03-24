@@ -41,7 +41,15 @@ export default {
   },
   methods: {
     statusText(s) {
-      const map = { PENDING: '待支付', PAID: '已支付', SHIPPED: '已发货', RECEIVED: '已收货', CANCELLED: '已取消' }
+      const map = {
+        PENDING: '待支付',
+        PAID: '已支付',
+        SHIPPED: '已发货',
+        RECEIVED: '已收货',
+        CANCELLED: '已取消',
+        REFUND_REQUESTED: '退货申请中',
+        REFUNDED: '已退款'
+      }
       return map[s] || s
     },
     load() {

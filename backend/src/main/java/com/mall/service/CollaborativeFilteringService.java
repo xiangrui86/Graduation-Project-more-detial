@@ -69,12 +69,12 @@ public class CollaborativeFilteringService {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        List<Product> list = productRepository.findByIdInAndOnSaleTrue(recommendedIds);
+        List<Product> list = productRepository.findPublicByIdIn(recommendedIds);
         Map<Long, Product> byId = list.stream().collect(Collectors.toMap(Product::getId, p -> p));
         return recommendedIds.stream().map(byId::get).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private List<Product> fallbackBySales(PageRequest pageRequest) {
-        return productRepository.findByOnSaleTrueOrderBySalesDesc(pageRequest);
+        return productRepository.findPublicSalesRank(pageRequest);
     }
 }

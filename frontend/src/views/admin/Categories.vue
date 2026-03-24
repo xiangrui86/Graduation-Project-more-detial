@@ -5,15 +5,43 @@
       <span class="sub">用于商品归类与展示</span>
     </div>
 
-    <div style="display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
+    <div class="toolbar">
       <el-button type="primary" @click="openCreateDialog">新增分类</el-button>
+      <el-input
+        v-model="keyword"
+        clearable
+        placeholder="搜索：分类名称 / ID"
+        class="search"
+      />
+      <el-select
+        v-model="parentFilter"
+        clearable
+        filterable
+        placeholder="父级筛选"
+        class="parent"
+      >
+        <el-option label="全部父级" :value="null" />
+        <el-option label="顶级分类（无父级）" :value="0" />
+        <el-option
+          v-for="c in parentOptions"
+          :key="c.id"
+          :label="c.name"
+          :value="c.id"
+        />
+      </el-select>
+      <span class="muted count">共 {{ filteredList.length }} 个</span>
     </div>
 
-    <el-table :data="list" border>
+    <el-table :data="filteredList" border>
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="名称" />
-      <el-table-column prop="parentId" label="父级ID" width="100" />
-      <el-table-column prop="sortOrder" label="排序" width="80" />
+      <el-table-column label="父级" width="180">
+        <template slot-scope="scope">
+          <span v-if="!scope.row.parentId" class="muted">顶级</span>
+          <span v-else>{{ categoryNameById(scope.row.parentId) }}（{{ scope.row.parentId }}）</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="sortOrder" label="排序" width="100" sortable />
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="openEditDialog(scope.row)"
@@ -33,13 +61,28 @@
       :title="isEdit ? '编辑分类' : '新增分类'"
       :visible.sync="dialogVisible"
       width="500px"
+      append-to-body
     >
       <el-form :model="form" label-width="100px">
         <el-form-item label="名称">
           <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="父级ID">
-          <el-input-number v-model="form.parentId" />
+        <el-form-item label="父级分类">
+          <el-select
+            v-model="form.parentId"
+            clearable
+            filterable
+            placeholder="不选则为顶级分类"
+            style="width: 100%"
+          >
+            <el-option label="顶级分类（无父级）" :value="null" />
+            <el-option
+              v-for="c in parentOptionsForForm"
+              :key="c.id"
+              :label="c.name"
+              :value="c.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="排序">
           <el-input-number v-model="form.sortOrder" />
@@ -66,15 +109,58 @@ export default {
   data() {
     return {
       list: [],
+      keyword: "",
+      parentFilter: null,
       dialogVisible: false,
       isEdit: false,
       form: { name: "", parentId: null, sortOrder: 0 },
     };
   },
+  computed: {
+    idNameMap() {
+      const map = {};
+      (this.list || []).forEach((c) => {
+        if (c && c.id != null) map[c.id] = c.name;
+      });
+      return map;
+    },
+    parentOptions() {
+      return (this.list || []).slice().sort((a, b) => (a.id || 0) - (b.id || 0));
+    },
+    parentOptionsForForm() {
+      const currentId = this.isEdit ? this.form.id : null;
+      return this.parentOptions.filter((c) => c && c.id != null && c.id !== currentId);
+    },
+    filteredList() {
+      let arr = (this.list || []).slice();
+      const kw = (this.keyword || "").trim().toLowerCase();
+      if (kw) {
+        arr = arr.filter((c) => {
+          const name = String(c.name || "").toLowerCase();
+          const id = String(c.id != null ? c.id : "");
+          return name.includes(kw) || id.includes(kw);
+        });
+      }
+      if (this.parentFilter != null) {
+        if (this.parentFilter === 0) arr = arr.filter((c) => !c.parentId);
+        else arr = arr.filter((c) => Number(c.parentId) === Number(this.parentFilter));
+      }
+      arr.sort((a, b) => {
+        const sa = Number(a.sortOrder) || 0;
+        const sb = Number(b.sortOrder) || 0;
+        if (sa !== sb) return sa - sb;
+        return (Number(a.id) || 0) - (Number(b.id) || 0);
+      });
+      return arr;
+    },
+  },
   created() {
     this.loadCategories();
   },
   methods: {
+    categoryNameById(id) {
+      return this.idNameMap[id] || "未知";
+    },
     loadCategories() {
       getCategories().then((res) => {
         if (res.data) this.list = res.data;
@@ -94,6 +180,10 @@ export default {
       const f = this.form;
       if (!f.name) {
         this.$message.warning("请填写分类名称");
+        return;
+      }
+      if (f.parentId === f.id) {
+        this.$message.warning("父级分类不能选择自己");
         return;
       }
       const promise = this.isEdit ? updateCategory(f.id, f) : createCategory(f);
@@ -124,3 +214,22 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.toolbar{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.search{
+  width: 240px;
+}
+.parent{
+  width: 240px;
+}
+.count{
+  margin-left: auto;
+}
+</style>

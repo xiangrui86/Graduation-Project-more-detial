@@ -20,33 +20,37 @@ public class PubProductController {
     private final ProductService productService;
     private final CollaborativeFilteringService collaborativeFilteringService;
 
+    /** 分页查询公开商品列表，可按分类过滤。 */
     @GetMapping("/products")
     public Result<?> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) Long categoryId) {
         if (categoryId != null) {
-            return Result.ok(productService.listByCategory(categoryId, PageRequest.of(page, size)));
+            return Result.ok(productService.listPublicByCategory(categoryId, PageRequest.of(page, size)));
         }
-        return Result.ok(productService.listAll(PageRequest.of(page, size)));
+        return Result.ok(productService.listPublicAll(PageRequest.of(page, size)));
     }
 
+    /** 查询公开商品详情。 */
     @GetMapping("/products/{id}")
     public Result<?> get(@PathVariable Long id) {
-        Optional<Product> p = productService.getById(id);
+        Optional<Product> p = productService.getPublicById(id);
         return p.map(pr -> Result.ok(pr))
                 .orElse(Result.fail("商品不存在"));
     }
 
+    /** 查询公开新品列表。 */
     @GetMapping("/products/new")
     public Result<?> newArrivals(@RequestParam(defaultValue = "10") int size) {
-        List<Product> list = productService.newArrivals(size);
+        List<Product> list = productService.publicNewArrivals(size);
         return Result.ok(list);
     }
 
+    /** 查询公开销量排行。 */
     @GetMapping("/products/rank")
     public Result<?> salesRank(@RequestParam(defaultValue = "10") int size) {
-        List<Product> list = productService.salesRanking(size);
+        List<Product> list = productService.publicSalesRanking(size);
         return Result.ok(list);
     }
 
