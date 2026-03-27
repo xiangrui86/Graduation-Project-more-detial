@@ -22,6 +22,7 @@
             <el-menu-item index="/merchant">数据报表</el-menu-item>
             <el-menu-item index="/merchant/products">商品管理</el-menu-item>
             <el-menu-item index="/merchant/inventory">库存管理</el-menu-item>
+            <el-menu-item index="/merchant/banner">轮播图管理</el-menu-item>
             <el-menu-item index="/merchant/reviews">评价管理</el-menu-item>
             <el-menu-item index="/merchant/orders">交易管理</el-menu-item>
           </el-menu>
