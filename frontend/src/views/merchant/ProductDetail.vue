@@ -57,7 +57,7 @@
                   accept="image/*"
                   :on-success="handleDetailImgUploadSuccess"
                   :on-error="handleUploadError"
-                  action="/pub/images/upload"
+                  action="/api/pub/images/upload"
                   :show-file-list="false"
                   style="display: none"
                 >
@@ -190,7 +190,7 @@
               accept="image/*"
               :on-success="handleSpecImgUploadSuccess"
               :on-error="handleUploadError"
-              action="/pub/images/upload"
+              action="/api/pub/images/upload"
               :show-file-list="false"
             >
               <el-button type="primary" size="small">上传</el-button>

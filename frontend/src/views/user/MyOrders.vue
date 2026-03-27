@@ -173,14 +173,14 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="100" align="center">
+        <el-table-column label="状态" width="100" align="center" fixed="right">
           <template #default="scope">
             <el-tag :type="getStatusType(scope.row.status)">
               {{ statusText(scope.row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
+        <el-table-column label="支付" width="80" align="center" fixed="right">
           <template #default="scope">
             <el-button
               v-if="scope.row.status === 'PENDING'"
@@ -190,21 +190,36 @@
             >
               去支付
             </el-button>
+            <span v-else class="action-disabled">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="取消" width="80" align="center" fixed="right">
+          <template #default="scope">
             <el-button
               v-if="['PENDING', 'PAID', 'TO_SHIP'].includes(scope.row.status)"
               size="small"
               @click="doCancelOrder(scope.row.id)"
             >
-              取消订单
+              取消
             </el-button>
+            <span v-else class="action-disabled">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="收货" width="80" align="center" fixed="right">
+          <template #default="scope">
             <el-button
               v-if="scope.row.status === 'SHIPPED'"
               type="success"
               size="small"
               @click="doConfirmReceive(scope.row.id)"
             >
-              确认收货
+              收货
             </el-button>
+            <span v-else class="action-disabled">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="评价" width="80" align="center" fixed="right">
+          <template #default="scope">
             <el-button
               v-if="scope.row.status === 'RECEIVED'"
               type="primary"
@@ -213,8 +228,13 @@
             >
               评价
             </el-button>
+            <span v-else class="action-disabled">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="详情" width="80" align="center" fixed="right">
+          <template #default="scope">
             <el-button size="small" plain @click="viewDetail(scope.row.id)">
-              查看详情
+              查看
             </el-button>
           </template>
         </el-table-column>
@@ -367,9 +387,10 @@
     <el-dialog
       title="评价商品"
       :visible.sync="reviewDialogVisible"
-      width="520px"
+      width="620px"
       append-to-body
       class="review-dialog"
+      @close="destroyReviewEditor"
     >
       <el-form label-width="72px">
         <el-form-item label="评分">
@@ -379,14 +400,9 @@
           />
         </el-form-item>
         <el-form-item label="内容">
-          <el-input
-            type="textarea"
-            v-model="reviewForm.content"
-            :rows="4"
-            maxlength="500"
-            show-word-limit
-            placeholder="请填写您对所购商品的评价"
-          />
+          <div class="editor-wrapper">
+            <div ref="reviewEditor" class="wang-editor-container"></div>
+          </div>
         </el-form-item>
       </el-form>
       <span slot="footer">
@@ -419,9 +435,7 @@
                 全选
               </el-checkbox>
               <span class="refund-select-tip">
-                已选{{ refundSelectedItemIds.length }}/{{
-                  refundItems.length
-                }}
+                已选{{ refundSelectedItemIds.length }}/{{ refundItems.length }}
                 件
               </span>
             </div>
@@ -520,6 +534,7 @@
 </template>
 
 <script>
+import E from "wangeditor";
 import {
   getMyOrders,
   getOrderDetail,
@@ -560,6 +575,7 @@ export default {
       reviewForm: { rating: 5, content: "" },
       reviewTarget: null,
       reviewedItemIds: [],
+      reviewEditor: null,
       keyword: "",
       statusOptions: [
         { label: "全部", value: "ALL" },
@@ -752,13 +768,78 @@ export default {
       this.reviewTarget = item;
       this.reviewForm = { rating: 5, content: "" };
       this.reviewDialogVisible = true;
+      this.$nextTick(() => {
+        this.initReviewEditor();
+      });
+    },
+    initReviewEditor() {
+      if (this.reviewEditor) {
+        this.reviewEditor.destroy();
+      }
+
+      this.reviewEditor = new E(this.$refs.reviewEditor);
+      this.reviewEditor.config.zIndex = 1000;
+      this.reviewEditor.config.uploadImgServer = "/api/pub/images/upload";
+      this.reviewEditor.config.uploadFileName = "file";
+
+      // 自定义上传图片处理
+      const self = this;
+      this.reviewEditor.config.customUploadImg = function (
+        resultFiles,
+        insertImgFn,
+      ) {
+        if (!resultFiles || resultFiles.length === 0) {
+          self.$message.warning("请选择图片");
+          return;
+        }
+
+        resultFiles.forEach((file) => {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const token = localStorage.getItem("token");
+          const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+          fetch("/api/pub/images/upload", {
+            method: "POST",
+            headers: headers,
+            body: formData,
+          })
+            .then((res) => res.json())
+            .then((res) => {
+              if (res.code === 200 && res.data && res.data.url) {
+                insertImgFn(res.data.url);
+                self.$message.success("图片上传成功");
+              } else {
+                self.$message.error(res.message || "图片上传失败");
+              }
+            })
+            .catch((error) => {
+              self.$message.error(
+                "图片上传异常: " + (error.message || "网络错误"),
+              );
+            });
+        });
+      };
+
+      // 配置其他选项
+      this.reviewEditor.config.height = 250;
+      this.reviewEditor.create();
+    },
+
+    destroyReviewEditor() {
+      if (this.reviewEditor) {
+        this.reviewEditor.destroy();
+        this.reviewEditor = null;
+      }
     },
     submitItemReview() {
       if (!this.reviewTarget) return;
-      if (
-        !this.reviewForm.content ||
-        this.reviewForm.content.trim().length < 5
-      ) {
+
+      const content = this.reviewEditor ? this.reviewEditor.txt.html() : "";
+      const plainText = this.reviewEditor ? this.reviewEditor.txt.text() : "";
+
+      if (!plainText || plainText.trim().length < 5) {
         this.$message.warning("请填写至少5个字的评价内容");
         return;
       }
@@ -766,7 +847,7 @@ export default {
         productId: this.reviewTarget.productId,
         orderId: this.detail.order.id,
         rating: this.reviewForm.rating,
-        content: this.reviewForm.content.trim(),
+        content: content,
       }).then((res) => {
         if (res.code === 200) {
           this.$message.success("评价成功，感谢您的反馈");
@@ -1086,7 +1167,30 @@ export default {
   font-weight: 600;
 }
 
-/* ── 分页 ── */
+/* ── 操作列 ── */
+.action-disabled {
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 隐藏表格右侧空白 */
+.table-container :deep(.el-table) {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-container :deep(.el-table__body-wrapper) {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.table-container :deep(.el-table__fixed-right) {
+  right: 0;
+  z-index: 10;
+}
+
+/* 分页 */
 .pagination {
   text-align: center;
   padding: 16px;
@@ -1403,6 +1507,23 @@ export default {
   border-color: #ff6900;
   background: #fff4ed;
   color: #ff6900;
+}
+
+/* ── 评价编辑器样式── */
+.editor-wrapper {
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.wang-editor-container {
+  min-height: 250px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.wang-editor-container /deep/ .w-e-text-container {
+  min-height: 200px;
 }
 
 /* ── 响应式── */

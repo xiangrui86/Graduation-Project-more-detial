@@ -322,31 +322,16 @@
     <div class="footer">
       <div class="footer-benefits">
         <div class="benefit-item">
-          <div class="benefit-icon">
-            <i class="el-icon-check"></i>
-          </div>
-          <div class="benefit-content">
-            <div class="benefit-title">7天无理由退换</div>
-            <div class="benefit-desc">收货后7天内可无理由退换</div>
-          </div>
+          <i class="el-icon-check"></i>
+          <span>7天无理由退换货</span>
         </div>
         <div class="benefit-item">
-          <div class="benefit-icon">
-            <i class="el-icon-truck"></i>
-          </div>
-          <div class="benefit-content">
-            <div class="benefit-title">全场包邮</div>
-            <div class="benefit-desc">订单金额满足条件即可免运费</div>
-          </div>
+          <i class="el-icon-goods"></i>
+          <span>全场包邮</span>
         </div>
         <div class="benefit-item">
-          <div class="benefit-icon">
-            <i class="el-icon-circle-check"></i>
-          </div>
-          <div class="benefit-content">
-            <div class="benefit-title">100%品质保证</div>
-            <div class="benefit-desc">所有商品通过严格质量检测</div>
-          </div>
+          <i class="el-icon-circle-check"></i>
+          <span>100%品质保证</span>
         </div>
       </div>
       <div class="footer-bottom">
@@ -1363,92 +1348,144 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.brand-logo {
+  height: 50px;
+  object-fit: contain;
+}
+
 /* 底部信息 */
 .footer {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: white;
-  padding: 60px 0 30px;
+  padding: 60px 0 0;
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 107, 0, 0.2);
 }
 
 .footer-benefits {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 40px 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
-  margin-bottom: 40px;
+  justify-items: center;
 }
 
 .benefit-item {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 105, 0, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .benefit-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 105, 0, 0.5);
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(255, 105, 0, 0.15);
 }
 
-.benefit-icon {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 105, 0, 0.3), rgba(255, 105, 0, 0.1));
+.benefit-item i {
+  font-size: 48px;
+  color: #ff6900;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 105, 0, 0.25);
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 107, 0, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
-.benefit-icon i {
-  font-size: 24px;
-  color: #ff9a4d;
-  filter: drop-shadow(0 2px 4px rgba(255, 105, 0, 0.2));
+.benefit-item:hover i {
+  background: rgba(255, 107, 0, 0.2);
+  transform: scale(1.1);
 }
 
-.benefit-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.benefit-title {
+.benefit-item span {
   font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 4px;
-  letter-spacing: 0.3px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: 0.5px;
 }
 
-.benefit-desc {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5;
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ff6900;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-section ul li a:hover {
+  color: #ff6900;
+}
+
+.social-links {
+  display: flex;
+  gap: 16px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: white;
+  transition: all 0.3s;
+}
+
+.social-link:hover {
+  background: #ff6900;
+  transform: translateY(-2px);
+}
+
+.social-link i {
+  font-size: 18px;
 }
 
 .footer-bottom {
   text-align: center;
-  padding-top: 30px;
+  padding: 30px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   color: rgba(255, 255, 255, 0.6);
   font-size: 14px;
-  letter-spacing: 0.3px;
-}
-
-.footer-bottom p {
-  margin: 0;
 }
 
 /* 响应式调整 */
@@ -1551,6 +1588,23 @@ export default {
   .footer-section {
     min-width: 100%;
   }
+
+  .footer-benefits {
+    grid-template-columns: 1fr;
+    padding: 30px 20px;
+    gap: 24px;
+  }
+
+  .benefit-item i {
+    width: 70px;
+    height: 70px;
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+
+  .benefit-item span {
+    font-size: 15px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -1586,6 +1640,28 @@ export default {
 
   .announcement-list li {
     min-width: 100%;
+  }
+
+  .footer-benefits {
+    grid-template-columns: 1fr;
+    padding: 24px 16px;
+    gap: 20px;
+  }
+
+  .benefit-item i {
+    width: 64px;
+    height: 64px;
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .benefit-item span {
+    font-size: 14px;
+  }
+
+  .footer-bottom {
+    padding: 24px 16px;
+    font-size: 12px;
   }
 }
 </style>

@@ -84,7 +84,9 @@
         <el-form-item>
           <el-button type="primary" @click="loadInventory">搜索</el-button>
           <el-button @click="resetSearch">重置</el-button>
-          <el-button type="success" @click="batchUpdateDialog = true">批量调整</el-button>
+          <el-button type="success" @click="batchUpdateDialog = true"
+            >批量调整</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -92,9 +94,14 @@
     <!-- 库存列表 -->
     <el-card class="inventory-table-card">
       <div slot="header" class="table-header">
-        <span>库存列表</span>
-        <el-button size="small" type="primary" @click="loadInventory">
-          <i class="el-icon-refresh"></i> 刷新
+        <span class="table-title">库存列表</span>
+        <el-button
+          size="small"
+          type="primary"
+          @click="loadInventory"
+          icon="el-icon-refresh"
+        >
+          刷新
         </el-button>
       </div>
 
@@ -103,64 +110,112 @@
         v-loading="loading"
         style="width: 100%"
         :height="tableHeight"
+        stripe
+        border
       >
-        <el-table-column prop="id" label="商品ID" width="80" />
-        <el-table-column label="商品信息" min-width="200">
+        <el-table-column label="商品信息" min-width="240">
           <template slot-scope="scope">
             <div class="product-info">
-              <img :src="scope.row.image" :alt="scope.row.name" class="product-image" />
+              <img
+                v-if="scope.row.image"
+                :src="scope.row.image"
+                :alt="scope.row.name"
+                class="product-image"
+              />
+              <div v-else class="product-image placeholder">
+                <i class="el-icon-picture-outline"></i>
+              </div>
               <div class="product-details">
                 <div class="product-name">{{ scope.row.name }}</div>
-                <div class="product-price">¥{{ scope.row.price }}</div>
+                <div class="product-meta">
+                  <span class="product-id">ID: {{ scope.row.id }}</span>
+                  <span class="product-price">¥{{ scope.row.price }}</span>
+                </div>
               </div>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="stock" label="当前库存" width="100">
+        <el-table-column label="当前库存" width="100" align="center">
           <template slot-scope="scope">
-            <el-tag
-              :type="getStockStatusType(scope.row.stock)"
-              size="small"
-            >
-              {{ scope.row.stock }}
-            </el-tag>
+            <div class="stock-display">
+              <span class="stock-number">{{ scope.row.stock }}</span>
+              <el-tag
+                :type="getStockStatusType(scope.row.stock)"
+                size="mini"
+                effect="plain"
+              >
+                {{ getStockStatusText(scope.row.stock) }}
+              </el-tag>
+            </div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="sales" label="销量" width="80" />
-
-        <el-table-column label="库存状态" width="120">
+        <el-table-column label="月销量" width="90" align="center">
           <template slot-scope="scope">
-            <el-tag :type="getStockStatusType(scope.row.stock)">
-              {{ getStockStatusText(scope.row.stock) }}
-            </el-tag>
+            <span class="sales-badge">{{ scope.row.sales || 0 }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="销售转化率" width="110" align="center">
+          <template slot-scope="scope">
+            <el-progress
+              :percentage="
+                Math.min(
+                  Math.round(
+                    ((scope.row.sales || 0) / (scope.row.stock || 1)) * 100,
+                  ),
+                  100,
+                )
+              "
+              :color="scope.row.sales > 10 ? '#67c23a' : '#409eff'"
+              :show-text="false"
+              :stroke-width="4"
+            />
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          label="快速操作"
+          width="160"
+          align="center"
+          fixed="right"
+        >
+          <template slot-scope="scope">
+            <div class="quick-actions">
+              <el-button
+                size="mini"
+                @click="quickAdjust(scope.row, -1)"
+                :disabled="scope.row.stock <= 0"
+                icon="el-icon-minus"
+                circle
+              />
+              <span class="action-divider">{{ scope.row.stock }}</span>
+              <el-button
+                size="mini"
+                type="warning"
+                @click="quickAdjust(scope.row, 1)"
+                icon="el-icon-plus"
+                circle
+              />
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          label="详细操作"
+          width="100"
+          align="center"
+          fixed="right"
+        >
           <template slot-scope="scope">
             <el-button
               size="mini"
               type="primary"
+              plain
               @click="editStock(scope.row)"
             >
-              调整库存
-            </el-button>
-            <el-button
-              size="mini"
-              type="warning"
-              @click="quickAdjust(scope.row, 1)"
-            >
-              +1
-            </el-button>
-            <el-button
-              size="mini"
-              type="warning"
-              @click="quickAdjust(scope.row, -1)"
-              :disabled="scope.row.stock <= 0"
-            >
-              -1
+              调整
             </el-button>
           </template>
         </el-table-column>
@@ -194,7 +249,7 @@
         label-width="80px"
       >
         <el-form-item label="商品">
-          <span>{{ currentProduct ? currentProduct.name : '' }}</span>
+          <span>{{ currentProduct ? currentProduct.name : "" }}</span>
         </el-form-item>
         <el-form-item label="当前库存">
           <span>{{ currentProduct ? currentProduct.stock : 0 }}</span>
@@ -212,7 +267,11 @@
 
       <div slot="footer">
         <el-button @click="stockDialog = false">取消</el-button>
-        <el-button type="primary" @click="confirmStockUpdate" :loading="updating">
+        <el-button
+          type="primary"
+          @click="confirmStockUpdate"
+          :loading="updating"
+        >
           确认调整
         </el-button>
       </div>
@@ -234,7 +293,9 @@
         </el-form-item>
 
         <el-form-item
-          :label="batchForm.adjustType === 'fixed' ? '增加/减少数量' : '调整百分比'"
+          :label="
+            batchForm.adjustType === 'fixed' ? '增加/减少数量' : '调整百分比'
+          "
         >
           <el-input-number
             v-model="batchForm.adjustValue"
@@ -244,7 +305,11 @@
             style="width: 100%"
           />
           <div class="form-tip">
-            {{ batchForm.adjustType === 'fixed' ? '正数增加库存，负数减少库存' : '正数增加百分比，负数减少百分比' }}
+            {{
+              batchForm.adjustType === "fixed"
+                ? "正数增加库存，负数减少库存"
+                : "正数增加百分比，负数减少百分比"
+            }}
           </div>
         </el-form-item>
 
@@ -259,7 +324,11 @@
 
       <div slot="footer">
         <el-button @click="batchUpdateDialog = false">取消</el-button>
-        <el-button type="primary" @click="confirmBatchUpdate" :loading="batchUpdating">
+        <el-button
+          type="primary"
+          @click="confirmBatchUpdate"
+          :loading="batchUpdating"
+        >
           确认批量调整
         </el-button>
       </div>
@@ -272,11 +341,11 @@ import {
   getInventory,
   updateProductStock,
   batchUpdateStock,
-  getStockWarnings
-} from '@/api/merchant';
+  getStockWarnings,
+} from "@/api/merchant";
 
 export default {
-  name: 'Inventory',
+  name: "Inventory",
   data() {
     return {
       // 统计数据
@@ -287,8 +356,8 @@ export default {
 
       // 搜索表单
       searchForm: {
-        keyword: '',
-        stockStatus: null
+        keyword: "",
+        stockStatus: null,
       },
 
       // 库存列表
@@ -303,34 +372,34 @@ export default {
       stockDialog: false,
       currentProduct: null,
       stockForm: {
-        newStock: 0
+        newStock: 0,
       },
       stockRules: {
         newStock: [
-          { required: true, message: '请输入新库存数量', trigger: 'blur' },
-          { type: 'number', min: 0, message: '库存不能小于0', trigger: 'blur' }
-        ]
+          { required: true, message: "请输入新库存数量", trigger: "blur" },
+          { type: "number", min: 0, message: "库存不能小于0", trigger: "blur" },
+        ],
       },
       updating: false,
 
       // 批量调整
       batchUpdateDialog: false,
       batchForm: {
-        adjustType: 'fixed',
+        adjustType: "fixed",
         adjustValue: 0,
-        targetProducts: []
+        targetProducts: [],
       },
-      batchUpdating: false
+      batchUpdating: false,
     };
   },
   mounted() {
     this.loadInventory();
     this.loadStatistics();
     this.calculateTableHeight();
-    window.addEventListener('resize', this.calculateTableHeight);
+    window.addEventListener("resize", this.calculateTableHeight);
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.calculateTableHeight);
+    window.removeEventListener("resize", this.calculateTableHeight);
   },
   methods: {
     // 加载库存列表
@@ -340,7 +409,7 @@ export default {
         const params = {
           page: this.currentPage - 1,
           size: this.pageSize,
-          ...this.searchForm
+          ...this.searchForm,
         };
 
         const res = await getInventory(params);
@@ -348,10 +417,10 @@ export default {
           this.inventoryList = res.data.content;
           this.totalElements = res.data.totalElements;
         } else {
-          this.$message.error(res.message || '加载库存列表失败');
+          this.$message.error(res.message || "加载库存列表失败");
         }
       } catch (error) {
-        this.$message.error('加载库存列表失败');
+        this.$message.error("加载库存列表失败");
       } finally {
         this.loading = false;
       }
@@ -369,23 +438,28 @@ export default {
         // 获取缺货商品数量
         const outOfStockRes = await getStockWarnings(0);
         if (outOfStockRes.code === 200) {
-          this.outOfStockCount = outOfStockRes.data.filter(p => p.stock === 0).length;
+          this.outOfStockCount = outOfStockRes.data.filter(
+            (p) => p.stock === 0,
+          ).length;
         }
 
         // 计算总商品数和总库存
         const allRes = await getInventory({ page: 0, size: 1000 });
         if (allRes.code === 200) {
           this.totalProducts = allRes.data.totalElements;
-          this.totalStock = allRes.data.content.reduce((sum, item) => sum + item.stock, 0);
+          this.totalStock = allRes.data.content.reduce(
+            (sum, item) => sum + item.stock,
+            0,
+          );
         }
       } catch (error) {
-        console.error('加载统计数据失败', error);
+        console.error("加载统计数据失败", error);
       }
     },
 
     // 重置搜索
     resetSearch() {
-      this.searchForm.keyword = '';
+      this.searchForm.keyword = "";
       this.searchForm.stockStatus = null;
       this.currentPage = 1;
       this.loadInventory();
@@ -393,16 +467,16 @@ export default {
 
     // 获取库存状态类型
     getStockStatusType(stock) {
-      if (stock === 0) return 'danger';
-      if (stock <= 10) return 'warning';
-      return 'success';
+      if (stock === 0) return "danger";
+      if (stock <= 10) return "warning";
+      return "success";
     },
 
     // 获取库存状态文本
     getStockStatusText(stock) {
-      if (stock === 0) return '缺货';
-      if (stock <= 10) return '低库存';
-      return '正常';
+      if (stock === 0) return "缺货";
+      if (stock <= 10) return "低库存";
+      return "正常";
     },
 
     // 编辑库存
@@ -416,7 +490,7 @@ export default {
     async quickAdjust(product, change) {
       const newStock = product.stock + change;
       if (newStock < 0) {
-        this.$message.warning('库存不能小于0');
+        this.$message.warning("库存不能小于0");
         return;
       }
 
@@ -424,13 +498,15 @@ export default {
         const res = await updateProductStock(product.id, newStock);
         if (res.code === 200) {
           product.stock = newStock;
-          this.$message.success(`库存调整成功：${res.data.oldStock} → ${res.data.newStock}`);
+          this.$message.success(
+            `库存调整成功：${res.data.oldStock} → ${res.data.newStock}`,
+          );
           this.loadStatistics();
         } else {
-          this.$message.error(res.message || '调整库存失败');
+          this.$message.error(res.message || "调整库存失败");
         }
       } catch (error) {
-        this.$message.error('调整库存失败');
+        this.$message.error("调整库存失败");
       }
     },
 
@@ -441,17 +517,22 @@ export default {
 
         this.updating = true;
         try {
-          const res = await updateProductStock(this.currentProduct.id, this.stockForm.newStock);
+          const res = await updateProductStock(
+            this.currentProduct.id,
+            this.stockForm.newStock,
+          );
           if (res.code === 200) {
             this.currentProduct.stock = this.stockForm.newStock;
             this.stockDialog = false;
-            this.$message.success(`库存调整成功：${res.data.oldStock} → ${res.data.newStock}`);
+            this.$message.success(
+              `库存调整成功：${res.data.oldStock} → ${res.data.newStock}`,
+            );
             this.loadStatistics();
           } else {
-            this.$message.error(res.message || '调整库存失败');
+            this.$message.error(res.message || "调整库存失败");
           }
         } catch (error) {
-          this.$message.error('调整库存失败');
+          this.$message.error("调整库存失败");
         } finally {
           this.updating = false;
         }
@@ -467,12 +548,12 @@ export default {
     // 确认批量调整
     async confirmBatchUpdate() {
       if (this.batchForm.targetProducts.length === 0) {
-        this.$message.warning('请选择应用范围');
+        this.$message.warning("请选择应用范围");
         return;
       }
 
       if (this.batchForm.adjustValue === 0) {
-        this.$message.warning('调整值不能为0');
+        this.$message.warning("调整值不能为0");
         return;
       }
 
@@ -483,13 +564,15 @@ export default {
         const stockUpdates = {};
 
         // 简化实现：获取当前页面的商品进行批量调整
-        this.inventoryList.forEach(product => {
+        this.inventoryList.forEach((product) => {
           let newStock = product.stock;
 
-          if (this.batchForm.adjustType === 'fixed') {
+          if (this.batchForm.adjustType === "fixed") {
             newStock += this.batchForm.adjustValue;
           } else {
-            newStock = Math.round(newStock * (1 + this.batchForm.adjustValue / 100));
+            newStock = Math.round(
+              newStock * (1 + this.batchForm.adjustValue / 100),
+            );
           }
 
           if (newStock >= 0) {
@@ -498,21 +581,21 @@ export default {
         });
 
         if (Object.keys(stockUpdates).length === 0) {
-          this.$message.warning('没有符合条件的商品');
+          this.$message.warning("没有符合条件的商品");
           return;
         }
 
         const res = await batchUpdateStock(stockUpdates);
         if (res.code === 200) {
           this.batchUpdateDialog = false;
-          this.$message.success('批量调整库存成功');
+          this.$message.success("批量调整库存成功");
           this.loadInventory();
           this.loadStatistics();
         } else {
-          this.$message.error(res.message || '批量调整失败');
+          this.$message.error(res.message || "批量调整失败");
         }
       } catch (error) {
-        this.$message.error('批量调整失败');
+        this.$message.error("批量调整失败");
       } finally {
         this.batchUpdating = false;
       }
@@ -520,7 +603,7 @@ export default {
 
     // 重置批量表单
     resetBatchForm() {
-      this.batchForm.adjustType = 'fixed';
+      this.batchForm.adjustType = "fixed";
       this.batchForm.adjustValue = 0;
       this.batchForm.targetProducts = [];
     },
@@ -540,8 +623,8 @@ export default {
     // 计算表格高度
     calculateTableHeight() {
       this.tableHeight = window.innerHeight - 400;
-    }
-  }
+    },
+  },
 };
 </script>
 

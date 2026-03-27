@@ -121,6 +121,17 @@ public class UserOrderController {
         return Result.ok(null);
     }
 
+    /** 完成订单（评价后）。 */
+    @PostMapping("/{id}/complete")
+    public Result<?> complete(Authentication auth, @PathVariable Long id) {
+        Optional<Order> o = orderService.getById(id);
+        if (o.isEmpty() || !o.get().getUserId().equals(currentUserId(auth))) {
+            return Result.fail("订单不存在");
+        }
+        orderService.updateStatus(id, "COMPLETED");
+        return Result.ok(null);
+    }
+
     /** 收货前取消订单。 */
     @PostMapping("/{id}/cancel")
     public Result<?> cancel(Authentication auth, @PathVariable Long id) {

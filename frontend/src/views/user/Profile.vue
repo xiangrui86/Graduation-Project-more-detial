@@ -37,9 +37,10 @@
           <div class="upload-section">
             <el-upload
               class="avatar-uploader"
-              action="/pub/images/upload"
+              action="/api/pub/images/upload"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
+              :on-error="handleAvatarError"
               :before-upload="beforeAvatarUpload"
               :headers="uploadHeaders"
             >
@@ -57,7 +58,7 @@
             <span>快捷操作</span>
           </div>
           <div class="quick-links">
-            <div class="link-item" @click="$router.push('/my-orders')">
+            <div class="link-item" @click="$router.push('/orders')">
               <div class="link-icon">
                 <i class="el-icon-shopping-bag-1"></i>
               </div>
@@ -740,6 +741,9 @@ export default {
       } else {
         this.$message.error(res.message || "头像上传失败");
       }
+    },
+    handleAvatarError(err) {
+      this.$message.error("头像上传失败: " + (err.message || "网络错误"));
     },
     saveProfile() {
       this.$refs.profileForm.validate((valid) => {

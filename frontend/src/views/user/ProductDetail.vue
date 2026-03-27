@@ -117,10 +117,6 @@
           <span class="stat"
             ><i class="el-icon-box"></i> 库存 {{ product.stock }} 件</span
           >
-          <span class="stat"
-            ><i class="el-icon-chat-line-round"></i>
-            商品评价已移到订单完成后放在订单页</span
-          >
         </div>
 
         <!-- 价格区域 -->

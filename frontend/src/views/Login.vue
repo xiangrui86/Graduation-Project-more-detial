@@ -17,37 +17,7 @@
       </div>
       <h2 class="login-title">欢迎登录</h2>
 
-      <!-- 角色选择 -->
-      <div class="role-selector">
-        <div class="role-title">选择登录角色</div>
-        <div class="role-options">
-          <div
-            class="role-option"
-            :class="{ active: selectedRole === 'USER' }"
-            @click="selectedRole = 'USER'"
-          >
-            <i class="el-icon-user"></i>
-            <span>用户</span>
-          </div>
-          <div
-            class="role-option"
-            :class="{ active: selectedRole === 'MERCHANT' }"
-            @click="selectedRole = 'MERCHANT'"
-          >
-            <i class="el-icon-shop"></i>
-            <span>运营</span>
-          </div>
-          <div
-            class="role-option"
-            :class="{ active: selectedRole === 'ADMIN' }"
-            @click="selectedRole = 'ADMIN'"
-          >
-            <i class="el-icon-s-custom"></i>
-            <span>管理员</span>
-          </div>
-        </div>
-      </div>
-
+      <!-- 登录表单 -->
       <el-form
         ref="loginForm"
         :model="form"
@@ -56,6 +26,18 @@
         class="login-form"
         @keyup.enter="handleLogin"
       >
+        <el-form-item prop="role">
+          <el-select
+            v-model="selectedRole"
+            placeholder="请选择登录角色"
+            size="large"
+            style="width: 100%"
+          >
+            <el-option label="普通用户" value="USER" />
+            <el-option label="管理员" value="ADMIN" />
+            <el-option label="运营" value="MERCHANT" />
+          </el-select>
+        </el-form-item>
         <el-form-item prop="username">
           <el-input
             v-model="form.username"
