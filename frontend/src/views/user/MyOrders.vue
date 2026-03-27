@@ -378,6 +378,21 @@
                 <i class="el-icon-circle-check"></i> 已退款
               </span>
             </div>
+            <!-- 评价操作 -->
+            <div class="item-action-col">
+              <el-button
+                v-if="detail.order.status === 'RECEIVED' && !item.reviewed"
+                size="small"
+                type="primary"
+                @click="openItemReview(item)"
+              >
+                评价
+              </el-button>
+              <span v-else-if="item.reviewed" class="already-reviewed">
+                <i class="el-icon-circle-check"></i> 已评价
+              </span>
+              <span v-else class="action-disabled">—</span>
+            </div>
           </div>
         </div>
       </div>
@@ -763,6 +778,11 @@ export default {
     openItemReview(item) {
       if (!this.detail || this.detail.order.status !== "RECEIVED") {
         this.$message.warning("只有已完成订单才能评价");
+        return;
+      }
+      // 检查是否已评价过
+      if (item.reviewed) {
+        this.$message.warning("该商品已评价，不能重复评价");
         return;
       }
       this.reviewTarget = item;
@@ -1376,6 +1396,16 @@ export default {
 .chip-done {
   background: #f0f9ff;
   color: #67c23a;
+}
+.item-action-col {
+  text-align: center;
+}
+.already-reviewed {
+  color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
 }
 
 /* ── 退货弹窗── */

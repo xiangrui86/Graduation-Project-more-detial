@@ -83,8 +83,7 @@ const routes = [
       },
       {
         path: "announcements",
-        name: "Announcements",
-        component: () => import("@/views/user/Announcements.vue"),
+        redirect: "news",
       },
       {
         path: "chat",
@@ -128,6 +127,11 @@ const routes = [
         name: "AdminNews",
         component: () => import("@/views/admin/News.vue"),
       },
+      {
+        path: "reviews",
+        name: "AdminReviews",
+        component: () => import("@/views/admin/Reviews.vue"),
+      },
     ],
   },
   {
@@ -154,6 +158,11 @@ const routes = [
         path: "inventory",
         name: "MerchantInventory",
         component: () => import("@/views/merchant/Inventory.vue"),
+      },
+      {
+        path: "reviews",
+        name: "MerchantReviews",
+        component: () => import("@/views/merchant/Reviews.vue"),
       },
       {
         path: "orders",

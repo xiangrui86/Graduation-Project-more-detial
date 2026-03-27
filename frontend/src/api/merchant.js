@@ -87,6 +87,28 @@ export function getStockWarnings(threshold = 10) {
   return request.get("/merchant/inventory/warnings", { params: { threshold } });
 }
 
+/** 评价管理相关接口 */
+
+/** 查询评价列表 */
+export function getReviews(params) {
+  return request.get("/merchant/review", { params });
+}
+
+/** 查询单个商品的评价 */
+export function getProductReviews(productId) {
+  return request.get(`/merchant/review/product/${productId}`);
+}
+
+/** 删除单条评价 */
+export function deleteReview(reviewId) {
+  return request.delete(`/merchant/review/${reviewId}`);
+}
+
+/** 批量删除评价 */
+export function deleteReviews(reviewIds) {
+  return request.post("/merchant/review/batch-delete", reviewIds);
+}
+
 /** 订单发货 */
 export function shipOrder(id) {
   return request.post(`/merchant/order/${id}/ship`);

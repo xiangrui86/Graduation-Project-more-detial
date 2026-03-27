@@ -1,113 +1,176 @@
 <template>
   <div class="page-block">
     <div class="page-title">
-      <h2>资讯管理</h2>
-      <span class="sub">公告/资讯编辑与发布</span>
+      <h2>资讯与公告管理</h2>
+      <span class="sub">创建和管理平台的资讯和公告</span>
     </div>
 
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px">
-      <el-button type="primary" @click="openCreateDialog">新增资讯</el-button>
-      <el-button type="success" @click="openAnnouncementDialog"
-        >发布公告</el-button
+    <!-- 操作栏 -->
+    <div class="action-bar">
+      <el-button type="primary" @click="openCreateDialog" icon="el-icon-plus">
+        发布资讯
+      </el-button>
+      <el-button
+        type="warning"
+        @click="openAnnouncementDialog"
+        icon="el-icon-bell"
       >
+        发布公告
+      </el-button>
+      <div style="flex: 1"></div>
+      <el-input
+        v-model="searchTitle"
+        placeholder="搜索标题..."
+        style="width: 200px"
+        clearable
+        @change="loadNews"
+      />
     </div>
 
-    <el-table :data="list" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="title" label="标题" />
-      <el-table-column prop="type" label="类型" width="100" />
-      <el-table-column prop="published" label="发布" width="80">
+    <!-- 列表 -->
+    <el-table
+      :data="filteredList"
+      border
+      style="width: 100%"
+      :default-sort="{ prop: 'createdAt', order: 'descending' }"
+    >
+      <el-table-column prop="id" label="ID" width="60" align="center" />
+      <el-table-column prop="title" label="标题" min-width="200" />
+      <el-table-column prop="type" label="类型" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.published ? 'success' : 'info'">{{
-            scope.row.published ? "是" : "否"
-          }}</el-tag>
+          <el-tag :type="scope.row.type === 'ANNOUNCEMENT' ? 'danger' : 'info'">
+            {{ scope.row.type === "ANNOUNCEMENT" ? "公告" : "资讯" }}
+          </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="创建时间" />
-      <el-table-column label="操作" width="150">
+      <el-table-column
+        prop="published"
+        label="发布状态"
+        width="100"
+        align="center"
+      >
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="openEditDialog(scope.row)"
-            >编辑</el-button
+          <el-tag :type="scope.row.published ? 'success' : 'info'">
+            {{ scope.row.published ? "已发布" : "草稿" }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="createdAt"
+        label="创建时间"
+        width="180"
+        sortable
+        align="center"
+      >
+        <template slot-scope="scope">
+          {{ formatDate(scope.row.createdAt) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="180" align="center">
+        <template slot-scope="scope">
+          <el-button
+            type="text"
+            size="small"
+            @click="openEditDialog(scope.row)"
           >
-          <el-button type="text" size="small" @click="deleteNews(scope.row.id)"
-            >删除</el-button
-          >
+            编辑
+          </el-button>
+          <el-divider direction="vertical"></el-divider>
+          <el-button type="text" size="small" @click="deleteNews(scope.row.id)">
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
+    <!-- 创建/编辑对话框 -->
     <el-dialog
-      :title="isEdit ? '编辑资讯' : '新增资讯'"
+      :title="isEdit ? '编辑内容' : '发布新内容'"
       :visible.sync="dialogVisible"
-      width="600px"
+      width="700px"
       append-to-body
+      @close="resetForm"
     >
-      <el-form :model="form" label-width="100px">
-        <el-form-item label="标题">
-          <el-input v-model="form.title" />
+      <el-form :model="form" label-width="80px" :rules="rules" ref="form">
+        <el-form-item label="类型" prop="type">
+          <el-radio-group v-model="form.type">
+            <el-radio label="NEWS">资讯</el-radio>
+            <el-radio label="ANNOUNCEMENT">公告</el-radio>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="内容">
-          <el-input v-model="form.content" type="textarea" rows="6" />
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入标题" />
         </el-form-item>
-        <el-form-item label="类型">
-          <el-input v-model="form.type" />
+        <el-form-item label="内容" prop="content">
+          <el-input
+            v-model="form.content"
+            type="textarea"
+            rows="8"
+            placeholder="请输入内容"
+            show-word-limit
+            maxlength="2000"
+          />
         </el-form-item>
-        <el-form-item label="发布">
+        <el-form-item label="发布" prop="published">
           <el-switch v-model="form.published" />
+          <span style="margin-left: 10px; color: #909399; font-size: 12px">
+            关闭则保存为草稿
+          </span>
         </el-form-item>
       </el-form>
       <span slot="footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm">提交</el-button>
-      </span>
-    </el-dialog>
-
-    <el-dialog
-      :title="'发布公告'"
-      :visible.sync="announcementVisible"
-      width="600px"
-      append-to-body
-    >
-      <el-form :model="announcementForm" label-width="100px">
-        <el-form-item label="标题">
-          <el-input v-model="announcementForm.title" />
-        </el-form-item>
-        <el-form-item label="内容">
-          <el-input
-            v-model="announcementForm.content"
-            type="textarea"
-            rows="6"
-          />
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-        <el-button @click="announcementVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitAnnouncement">发布</el-button>
+        <el-button type="primary" @click="submitForm($refs.form)">
+          {{ isEdit ? "更新" : "发布" }}
+        </el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  getNews,
-  createNews,
-  updateNews,
-  deleteNews,
-  createAnnouncement,
-} from "@/api/admin";
+import { getNews, createNews, updateNews, deleteNews } from "@/api/admin";
 
 export default {
   name: "AdminNews",
   data() {
+    const validateTitle = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("标题不能为空"));
+      } else if (value.length > 128) {
+        callback(new Error("标题长度不能超过128字符"));
+      } else {
+        callback();
+      }
+    };
+    const validateContent = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("内容不能为空"));
+      } else if (value.length > 2000) {
+        callback(new Error("内容长度不能超过2000字符"));
+      } else {
+        callback();
+      }
+    };
+
     return {
       list: [],
+      searchTitle: "",
       dialogVisible: false,
       isEdit: false,
-      form: { title: "", content: "", type: "", published: false },
-      announcementVisible: false,
-      announcementForm: { title: "", content: "" },
+      form: { title: "", content: "", type: "NEWS", published: false },
+      rules: {
+        title: [{ validator: validateTitle, trigger: "blur" }],
+        content: [{ validator: validateContent, trigger: "blur" }],
+      },
     };
+  },
+  computed: {
+    filteredList() {
+      return this.list.filter(
+        (item) => !this.searchTitle || item.title.includes(this.searchTitle),
+      );
+    },
   },
   created() {
     this.loadNews();
@@ -115,21 +178,31 @@ export default {
   methods: {
     loadNews() {
       getNews().then((res) => {
-        if (res.data) this.list = res.data;
+        if (res.data) {
+          // 数据可能是数组或分页对象
+          this.list = Array.isArray(res.data)
+            ? res.data
+            : res.data.content || [];
+        }
       });
     },
     openCreateDialog() {
       this.isEdit = false;
-      this.form = { title: "", content: "", type: "", published: false };
+      this.form = { title: "", content: "", type: "NEWS", published: false };
       this.dialogVisible = true;
     },
     openAnnouncementDialog() {
-      this.announcementForm = { title: "", content: "" };
-      this.announcementVisible = true;
+      this.isEdit = false;
+      this.form = {
+        title: "",
+        content: "",
+        type: "ANNOUNCEMENT",
+        published: true,
+      };
+      this.dialogVisible = true;
     },
     openEditDialog(row) {
       this.isEdit = true;
-      // 只拷贝接口需要的字段，避免把多余字段一并提交
       this.form = {
         id: row.id,
         title: row.title,
@@ -139,41 +212,33 @@ export default {
       };
       this.dialogVisible = true;
     },
-    submitForm() {
-      const f = this.form;
-      if (!f.title || !f.content) {
-        this.$message.warning("请填写标题和内容");
-        return;
-      }
-      const promise = this.isEdit ? updateNews(f.id, f) : createNews(f);
-      promise.then((res) => {
-        if (res.code === 200) {
-          this.$message.success(this.isEdit ? "更新成功" : "创建成功");
-          this.dialogVisible = false;
-          this.loadNews();
-        } else {
-          this.$message.error(res.message || "操作失败");
-        }
-      });
-    },
-    submitAnnouncement() {
-      const f = this.announcementForm;
-      if (!f.title || !f.content) {
-        this.$message.warning("请填写标题和内容");
-        return;
-      }
-      createAnnouncement(f).then((res) => {
-        if (res.code === 200) {
-          this.$message.success("公告发布成功");
-          this.announcementVisible = false;
-          this.loadNews();
-        } else {
-          this.$message.error(res.message || "公告发布失败");
+    submitForm(form) {
+      form.validate((valid) => {
+        if (valid) {
+          const f = this.form;
+          const promise = this.isEdit ? updateNews(f.id, f) : createNews(f);
+          promise
+            .then((res) => {
+              if (res.code === 200) {
+                this.$message.success(this.isEdit ? "更新成功" : "发布成功");
+                this.dialogVisible = false;
+                this.loadNews();
+              } else {
+                this.$message.error(res.message || "操作失败");
+              }
+            })
+            .catch(() => {
+              this.$message.error("操作失败");
+            });
         }
       });
     },
     deleteNews(id) {
-      this.$confirm("确认删除？", "提示", { type: "warning" })
+      this.$confirm("确认删除此内容？删除后不可恢复。", "提示", {
+        type: "warning",
+        confirmButtonText: "确认删除",
+        cancelButtonText: "取消",
+      })
         .then(() => {
           deleteNews(id).then((res) => {
             if (res.code === 200) {
@@ -186,6 +251,56 @@ export default {
         })
         .catch(() => {});
     },
+    resetForm() {
+      this.$refs.form && this.$refs.form.clearValidate();
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
   },
 };
 </script>
+
+<style scoped>
+.action-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+/deep/ .el-divider--vertical {
+  margin: 0 8px;
+  background-color: #dcdfe6;
+  height: 16px;
+}
+
+/deep/ .el-tag {
+  border-radius: 3px;
+}
+
+/deep/ .el-table td {
+  padding: 12px 0;
+}
+
+/deep/ .el-form-item {
+  margin-bottom: 16px;
+}
+
+/deep/ .el-dialog__body {
+  padding: 20px;
+}
+
+/deep/ .el-input__textarea textarea {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro",
+    monospace;
+}
+</style>

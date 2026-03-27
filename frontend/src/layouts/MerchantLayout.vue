@@ -22,6 +22,7 @@
             <el-menu-item index="/merchant">数据报表</el-menu-item>
             <el-menu-item index="/merchant/products">商品管理</el-menu-item>
             <el-menu-item index="/merchant/inventory">库存管理</el-menu-item>
+            <el-menu-item index="/merchant/reviews">评价管理</el-menu-item>
             <el-menu-item index="/merchant/orders">交易管理</el-menu-item>
           </el-menu>
         </aside>
@@ -47,7 +48,9 @@ export default {
 </script>
 
 <style scoped>
-.shell { overflow: hidden; }
+.shell {
+  overflow: hidden;
+}
 .topbar {
   display: flex;
   align-items: center;
@@ -82,9 +85,21 @@ export default {
   font-weight: 900;
   letter-spacing: -0.5px;
 }
-.meta { line-height: 1.2; }
-.title { font-weight: 900; font-size: 15px; letter-spacing: 0.2px; color: var(--text); }
-.sub { font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 500; }
+.meta {
+  line-height: 1.2;
+}
+.title {
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+.sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+  font-weight: 500;
+}
 
 .body {
   display: flex;
@@ -94,9 +109,18 @@ export default {
   width: 224px;
   padding: 12px 8px;
   border-right: 1px solid rgba(15, 23, 42, 0.06);
-  background: linear-gradient(180deg, rgba(240,253,250,1) 0%, rgba(236,253,245,1) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(240, 253, 250, 1) 0%,
+    rgba(236, 253, 245, 1) 100%
+  );
   flex-shrink: 0;
 }
-.menu { background: transparent; }
-.main { flex: 1; min-width: 0; }
+.menu {
+  background: transparent;
+}
+.main {
+  flex: 1;
+  min-width: 0;
+}
 </style>

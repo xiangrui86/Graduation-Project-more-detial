@@ -183,7 +183,9 @@ export default {
       getReport().then((res) => {
         if (res.data) {
           this.data = res.data;
+          console.log("Dashboard data:", this.data);
           this.$nextTick(() => {
+            this.setChartOptions();
             this.updateCharts();
           });
         }
@@ -194,8 +196,6 @@ export default {
       this.categoryChart = echarts.init(this.$refs.categoryChart);
       this.userChart = echarts.init(this.$refs.userChart);
       this.productStatusChart = echarts.init(this.$refs.productStatusChart);
-
-      this.setChartOptions();
     },
     setChartOptions() {
       const commonTooltip = {
@@ -215,6 +215,17 @@ export default {
         containLabel: true,
       };
 
+      // 计算最近7天的日期标签
+      const dayLabels = [];
+      const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        dayLabels.push(
+          `${date.getMonth() + 1}/${date.getDate()} ${dayNames[date.getDay()]}`,
+        );
+      }
+
       // 订单趋势图
       const orderOption = {
         tooltip: commonTooltip,
@@ -222,7 +233,7 @@ export default {
         xAxis: {
           type: "category",
           boundaryGap: false,
-          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+          data: dayLabels,
           axisLine: { lineStyle: { color: "#cbd5e0" } },
           axisLabel: {
             color: "#718096",
@@ -250,7 +261,7 @@ export default {
             name: "订单数",
             type: "line",
             smooth: true,
-            data: [12, 18, 15, 24, 32, 28, 35],
+            data: this.data.orderTrend || [0, 0, 0, 0, 0, 0, 0],
             itemStyle: {
               color: "#4299e1",
             },
@@ -271,6 +282,17 @@ export default {
       };
 
       // 分类销售占比
+      const categoryData = (this.data.categorySales || []).map((item) => ({
+        value: item.value,
+        name: item.name,
+      }));
+
+      const colors = ["#4299e1", "#48bb78", "#ed8936", "#f56565", "#9f7aea"];
+      const categoryDataWithColor = categoryData.map((item, index) => ({
+        ...item,
+        itemStyle: { color: colors[index % colors.length] },
+      }));
+
       const categoryOption = {
         tooltip: {
           trigger: "item",
@@ -318,16 +340,21 @@ export default {
             labelLine: {
               show: false,
             },
-            data: [
-              { value: 35, name: "足球用品", itemStyle: { color: "#4299e1" } },
-              { value: 28, name: "篮球用品", itemStyle: { color: "#48bb78" } },
-              { value: 20, name: "健身器材", itemStyle: { color: "#ed8936" } },
-              { value: 10, name: "羽毛球", itemStyle: { color: "#f56565" } },
-              { value: 7, name: "乒乓球", itemStyle: { color: "#9f7aea" } },
-            ],
+            data:
+              categoryDataWithColor.length > 0
+                ? categoryDataWithColor
+                : [{ value: 1, name: "暂无数据" }],
           },
         ],
       };
+
+      // 计算最近6个月的月份标签
+      const monthLabels = [];
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        monthLabels.push(`${date.getMonth() + 1}月`);
+      }
 
       // 用户增长图
       const userOption = {
@@ -336,7 +363,7 @@ export default {
         xAxis: {
           type: "category",
           boundaryGap: false,
-          data: ["1 月", "2 月", "3 月", "4 月", "5 月", "6 月"],
+          data: monthLabels,
           axisLine: { lineStyle: { color: "#cbd5e0" } },
           axisLabel: {
             color: "#718096",
@@ -364,7 +391,7 @@ export default {
             name: "用户数",
             type: "line",
             smooth: true,
-            data: [120, 185, 256, 342, 458, 589],
+            data: this.data.userGrowth || [0, 0, 0, 0, 0, 0],
             itemStyle: {
               color: "#48bb78",
             },
@@ -385,6 +412,29 @@ export default {
       };
 
       // 商品状态分布
+      const productStatusData = this.data.productStatus || {
+        销售中: 0,
+        已售罄: 0,
+        已下架: 0,
+      };
+      const productStatusChartData = [
+        {
+          value: productStatusData["销售中"] || 0,
+          name: "销售中",
+          itemStyle: { color: "#48bb78" },
+        },
+        {
+          value: productStatusData["已售罄"] || 0,
+          name: "已售罄",
+          itemStyle: { color: "#f56565" },
+        },
+        {
+          value: productStatusData["已下架"] || 0,
+          name: "已下架",
+          itemStyle: { color: "#a0aec0" },
+        },
+      ];
+
       const productStatusOption = {
         tooltip: {
           trigger: "item",
@@ -425,19 +475,39 @@ export default {
                 shadowColor: "rgba(0, 0, 0, 0.2)",
               },
             },
-            data: [
-              { value: 85, name: "销售中", itemStyle: { color: "#48bb78" } },
-              { value: 10, name: "已售罄", itemStyle: { color: "#f56565" } },
-              { value: 5, name: "下架", itemStyle: { color: "#a0aec0" } },
-            ],
+            data: productStatusChartData,
           },
         ],
       };
 
-      this.orderChart.setOption(orderOption);
-      this.categoryChart.setOption(categoryOption);
-      this.userChart.setOption(userOption);
-      this.productStatusChart.setOption(productStatusOption);
+      // 确保图表对象存在后再设置选项
+      if (!this.orderChart) {
+        console.error("订单趋势图表未初始化");
+        this.initCharts();
+      }
+      if (!this.categoryChart) {
+        console.error("分类销售占比图表未初始化");
+        this.initCharts();
+      }
+      if (!this.userChart) {
+        console.error("用户增长图表未初始化");
+        this.initCharts();
+      }
+      if (!this.productStatusChart) {
+        console.error("商品状态图表未初始化");
+        this.initCharts();
+      }
+
+      try {
+        this.orderChart && this.orderChart.setOption(orderOption);
+        this.categoryChart && this.categoryChart.setOption(categoryOption);
+        this.userChart && this.userChart.setOption(userOption);
+        this.productStatusChart &&
+          this.productStatusChart.setOption(productStatusOption);
+        console.log("图表已成功更新");
+      } catch (e) {
+        console.error("设置图表选项时出错:", e);
+      }
     },
     updateCharts() {
       if (this.orderChart) this.orderChart.resize();

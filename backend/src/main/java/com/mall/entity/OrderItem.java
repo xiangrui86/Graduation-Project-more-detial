@@ -57,6 +57,11 @@ public class OrderItem {
     @Column(name = "refund_request_time")
     private LocalDateTime refundRequestTime;
 
+    /** 是否已评价 */
+    @Column(name = "reviewed", nullable = false)
+    @Builder.Default
+    private Boolean reviewed = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

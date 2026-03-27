@@ -109,3 +109,20 @@ export function deleteNews(id) {
 export function createAnnouncement(data) {
   return createNews({ ...data, type: "ANNOUNCEMENT", published: true });
 }
+
+/** 评价管理相关接口 */
+
+/** 查询评价列表 */
+export function getReviews(params) {
+  return request.get("/admin/review", { params });
+}
+
+/** 删除单条评价 */
+export function deleteReview(reviewId) {
+  return request.delete(`/admin/review/${reviewId}`);
+}
+
+/** 批量删除评价 */
+export function deleteReviews(reviewIds) {
+  return request.post("/admin/review/batch-delete", reviewIds);
+}
