@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/user/profile")
 @RequiredArgsConstructor
@@ -22,5 +24,17 @@ public class UserProfileController {
         return userService.getById(userId)
                 .map(u -> Result.ok(u))
                 .orElse(Result.fail("用户不存在"));
+    }
+
+    /** 更新当前登录用户资料。 */
+    @PutMapping
+    public Result<?> update(Authentication auth, @RequestBody Map<String, Object> body) {
+        Long userId = (Long) auth.getPrincipal();
+        try {
+            User updated = userService.updateProfile(userId, body);
+            return Result.ok(updated);
+        } catch (Exception e) {
+            return Result.fail(e.getMessage());
+        }
     }
 }

@@ -52,7 +52,7 @@
         <el-form-item label="角色">
           <el-select v-model="form.role">
             <el-option label="用户" value="USER" />
-            <el-option label="商家" value="MERCHANT" />
+            <el-option label="运营" value="MERCHANT" />
             <el-option label="管理员" value="ADMIN" />
           </el-select>
         </el-form-item>

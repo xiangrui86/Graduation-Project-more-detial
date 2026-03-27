@@ -19,9 +19,8 @@
           <el-menu :default-active="$route.path" router class="menu">
             <el-menu-item index="/admin">数据报表</el-menu-item>
             <el-menu-item index="/admin/users">用户管理</el-menu-item>
-            <el-menu-item index="/admin/merchants">商家管理</el-menu-item>
+            <el-menu-item index="/admin/merchants">运营管理</el-menu-item>
             <el-menu-item index="/admin/categories">分类管理</el-menu-item>
-            <el-menu-item index="/admin/products">商品管理</el-menu-item>
             <el-menu-item index="/admin/orders">交易管理</el-menu-item>
             <el-menu-item index="/admin/news">资讯管理</el-menu-item>
           </el-menu>
@@ -53,38 +52,47 @@ export default {
   display:flex;
   align-items:center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, .08);
-  background: rgba(255,255,255,.70);
-  backdrop-filter: blur(14px);
+  padding: 0 20px;
+  height: 60px;
+  border-bottom: 1px solid rgba(15, 23, 42, .07);
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
-.brand{ display:flex; align-items:center; gap: 10px; }
+.brand{ display:flex; align-items:center; gap: 12px; }
 .mark{
-  width: 30px;
-  height: 30px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #2563eb 0%, #ef4444 100%);
-  box-shadow: 0 10px 22px rgba(37, 99, 235, .18);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 60%, #4f46e5 100%);
+  box-shadow: 0 4px 14px rgba(99,102,241,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
-.meta{ line-height: 1.1; }
-.title{ font-weight: 900; letter-spacing: .2px; }
-.sub{ font-size: 12px; color: rgba(15,23,42,.62); margin-top: 2px; }
+.mark::after{
+  content: "A";
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -.5px;
+}
+.meta{ line-height: 1.2; }
+.title{ font-weight: 900; font-size: 15px; letter-spacing: .2px; color: var(--text); }
+.sub{ font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 500; }
 
 .body{
   display:flex;
   min-height: calc(100vh - 18px*2 - 60px);
 }
 .aside{
-  width: 240px;
-  padding: 14px 10px;
-  border-right: 1px solid rgba(15, 23, 42, .08);
-  background: rgba(255,255,255,.55);
+  width: 224px;
+  padding: 12px 8px;
+  border-right: 1px solid rgba(15, 23, 42, .06);
+  background: linear-gradient(180deg, rgba(248,250,253,1) 0%, rgba(241,244,251,1) 100%);
+  flex-shrink: 0;
 }
-.menu{
-  background: transparent;
-}
-.main{
-  flex: 1;
-  min-width: 0;
-}
+.menu{ background: transparent; }
+.main{ flex: 1; min-width: 0; }
 </style>

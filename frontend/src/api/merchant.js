@@ -1,16 +1,16 @@
 import request from "./request";
 
 /**
- * 商家端接口集合
+ * 运营端接口集合
  * 覆盖店铺看板、商品管理、订单履约和图片上传能力。
  */
 
-/** 获取商家看板数据 */
+/** 获取运营看板数据 */
 export function getReport() {
   return request.get("/merchant/report/dashboard");
 }
 
-/** 查询商家商品列表 */
+/** 查询运营商品列表 */
 export function getProducts(params) {
   return request.get("/merchant/product", { params });
 }
@@ -35,6 +35,26 @@ export function deleteProduct(id) {
   return request.delete(`/merchant/product/${id}`);
 }
 
+/** 创建商品规格 */
+export function createProductSpec(productId, data) {
+  return request.post(`/merchant/product-specs/${productId}`, data);
+}
+
+/** 更新商品规格 */
+export function updateProductSpec(specId, data) {
+  return request.put(`/merchant/product-specs/${specId}`, data);
+}
+
+/** 删除商品规格 */
+export function deleteProductSpec(specId) {
+  return request.delete(`/merchant/product-specs/${specId}`);
+}
+
+/** 查询商品所有规格 */
+export function getProductSpecs(productId) {
+  return request.get(`/merchant/product-specs/product/${productId}`);
+}
+
 /** 查询订单列表 */
 export function getOrders(params) {
   return request.get("/merchant/order", { params });
@@ -43,6 +63,28 @@ export function getOrders(params) {
 /** 查询订单详情 */
 export function getOrderDetail(id) {
   return request.get(`/merchant/order/${id}`);
+}
+
+/** 库存管理相关接口 */
+
+/** 查询库存列表 */
+export function getInventory(params) {
+  return request.get("/merchant/inventory", { params });
+}
+
+/** 调整商品库存 */
+export function updateProductStock(productId, stock) {
+  return request.put(`/merchant/inventory/${productId}/stock`, { stock });
+}
+
+/** 批量调整库存 */
+export function batchUpdateStock(stockUpdates) {
+  return request.put("/merchant/inventory/batch-stock", stockUpdates);
+}
+
+/** 获取库存预警 */
+export function getStockWarnings(threshold = 10) {
+  return request.get("/merchant/inventory/warnings", { params: { threshold } });
 }
 
 /** 订单发货 */

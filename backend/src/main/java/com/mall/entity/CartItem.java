@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart_item", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
+@Table(name = "cart_item", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id", "spec_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +23,9 @@ public class CartItem {
 
     @Column(name = "product_id", nullable = false)
     private Long productId;
+
+    @Column(name = "spec_id")
+    private Long specId;
 
     @Column(nullable = false)
     private Integer quantity = 1;

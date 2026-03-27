@@ -3,7 +3,7 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-// 路由表：按用户、管理员、商家三类角色划分
+// 路由表：按用户、管理员、运营三类角色划分
 const routes = [
   {
     path: "/login",
@@ -45,6 +45,16 @@ const routes = [
         path: "orders",
         name: "MyOrders",
         component: () => import("@/views/user/MyOrders.vue"),
+      },
+      {
+        path: "profile",
+        name: "UserProfile",
+        component: () => import("@/views/user/Profile.vue"),
+      },
+      {
+        path: "address-book",
+        name: "AddressBook",
+        component: () => import("@/views/user/AddressBook.vue"),
       },
       {
         path: "new",
@@ -109,11 +119,6 @@ const routes = [
         component: () => import("@/views/admin/Categories.vue"),
       },
       {
-        path: "products",
-        name: "AdminProducts",
-        component: () => import("@/views/admin/Products.vue"),
-      },
-      {
         path: "orders",
         name: "AdminOrders",
         component: () => import("@/views/admin/Orders.vue"),
@@ -139,6 +144,16 @@ const routes = [
         path: "products",
         name: "MerchantProducts",
         component: () => import("@/views/merchant/Products.vue"),
+      },
+      {
+        path: "products/:id/detail",
+        name: "MerchantProductDetail",
+        component: () => import("@/views/merchant/ProductDetail.vue"),
+      },
+      {
+        path: "inventory",
+        name: "MerchantInventory",
+        component: () => import("@/views/merchant/Inventory.vue"),
       },
       {
         path: "orders",

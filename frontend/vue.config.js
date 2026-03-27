@@ -6,6 +6,10 @@ module.exports = {
         target: "http://localhost:8080",
         changeOrigin: true,
       },
+      "/pub": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
       "/images": {
         target: "http://localhost:8080",
         changeOrigin: true,

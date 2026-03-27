@@ -1,24 +1,39 @@
 <template>
-  <el-card
-    class="product-card card-hover"
-    shadow="hover"
-    @click.native="goDetail"
-  >
-    <div class="media">
-      <img v-if="product.image" :src="product.image" class="img" alt="" />
-      <div v-else class="img placeholder">暂无图片</div>
+  <el-card class="product-card" shadow="hover" @click.native="goDetail">
+    <div class="product-image-wrapper">
+      <img
+        v-if="product.image"
+        :src="product.image"
+        class="product-image"
+        alt=""
+      />
+      <div v-else class="product-placeholder">
+        <i class="el-icon-picture-outline"></i>
+        <span>暂无图片</span>
+      </div>
+      <div v-if="product.isNew" class="badge-new">新品</div>
+      <div v-if="product.sales > 0" class="badge-hot">热销</div>
     </div>
-    <div class="info">
-      <div class="name" :title="product.name">{{ product.name }}</div>
-      <div class="bottom">
-        <div class="price">¥ {{ product.price }}</div>
-        <el-button
-          v-if="showCart"
-          size="small"
-          type="primary"
-          @click.stop="addCart"
-          >加购</el-button
-        >
+    <div class="product-info">
+      <div class="product-name" :title="product.name">{{ product.name }}</div>
+      <div class="product-desc">{{ product.description || "暂无描述" }}</div>
+      <div class="product-bottom">
+        <div class="price-wrapper">
+          <span class="price-symbol">¥</span>
+          <span class="price-value">{{ product.price }}</span>
+          <span
+            v-if="product.originalPrice > product.price"
+            class="original-price"
+            >¥{{ product.originalPrice }}</span
+          >
+        </div>
+        <div class="sales-info">已售 {{ product.sales || 0 }}</div>
+      </div>
+      <div v-if="showCart" class="action-bar">
+        <button class="add-cart-btn" @click.stop="addCart">
+          <i class="el-icon-shopping-cart-2"></i>
+          <span>加入购物车</span>
+        </button>
       </div>
     </div>
   </el-card>
@@ -48,74 +63,198 @@ export default {
           if (res.code === 200) this.$message.success("已加入购物车");
           else this.$message.error(res.message || "失败");
         })
-        .catch(() => this.$message.error("失败"));
+        .catch(() => this.$message.error("操作失败"));
     },
   },
 };
 </script>
 
 <style scoped>
-<style scoped > .product-card {
+.product-card {
   cursor: pointer;
-  margin-bottom: 16px;
-  border-radius: 12px;
+  margin-bottom: 20px;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s;
+  border: 1px solid #ececec;
+  transition: all 0.25s ease;
+  background: #fff;
 }
+
 .product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
-.media {
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: rgba(255, 255, 255, 0.55);
-}
-.img {
+
+.product-image-wrapper {
+  position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  display: block;
-  transition: 0.3s;
+  padding-top: 75%;
+  overflow: hidden;
+  background: #f5f5f5;
 }
-.product-card:hover .img {
-  transform: scale(1.08);
+
+.product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+  transition: transform 0.25s ease;
 }
-.placeholder {
+
+.product-card:hover .product-image {
+  transform: scale(1.03);
+}
+
+.product-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: rgba(15, 23, 42, 0.55);
+  color: #909399;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
 }
-.info {
-  padding-top: 10px;
+
+.product-placeholder i {
+  font-size: 48px;
+  margin-bottom: 8px;
 }
-.name {
-  font-size: 14px;
-  font-weight: 800;
+
+.badge-new,
+.badge-hot {
+  position: absolute;
+  top: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  border-radius: 999px;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.badge-new {
+  left: 12px;
+  background: #34c759;
+}
+
+.badge-hot {
+  right: 12px;
+  background: #ff6900;
+}
+
+.product-info {
+  padding: 16px;
+}
+
+.product-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: rgba(15, 23, 42, 0.88);
+  margin-bottom: 6px;
 }
-.bottom {
-  margin-top: 8px;
+
+.product-desc {
+  font-size: 13px;
+  color: #999;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 12px;
+}
+
+.product-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.price-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price-symbol {
+  font-size: 14px;
+  color: #ff6900;
+  font-weight: 600;
+}
+
+.price-value {
+  font-size: 24px;
+  color: #ff6900;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.original-price {
+  font-size: 13px;
+  color: #a0aec0;
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+
+.sales-info {
+  font-size: 12px;
+  color: #999;
+}
+
+.action-bar {
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.add-cart-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: #ff6900;
+  border: 1px solid #ff6900;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s;
+  box-shadow: none;
 }
-.price {
-  color: #ef4444;
-  font-weight: 900;
-  letter-spacing: 0.2px;
+
+.add-cart-btn:hover {
+  background: #ff7e29;
+  border-color: #ff7e29;
 }
-.el-button.add-cart-btn {
-  background: linear-gradient(135deg, #ff7a18, #ffb347);
-  border: none;
-  color: white;
-  border-radius: 20px;
+
+.add-cart-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .product-info {
+    padding: 12px;
+  }
+
+  .product-name {
+    font-size: 14px;
+  }
+
+  .price-value {
+    font-size: 20px;
+  }
 }
 </style>

@@ -54,3 +54,13 @@ export function getAnnouncements(size = 5) {
 export function getReviews(productId, page = 0, size = 10) {
   return request.get('/pub/reviews', { params: { productId, page, size } })
 }
+
+/** 查询商品规格列表 */
+export function getProductSpecs(productId) {
+  return request.get(`/api/product-specs/product/${productId}`)
+}
+
+/** 查询单个规格详情 */
+export function getProductSpec(specId) {
+  return request.get(`/api/product-specs/${specId}`)
+}

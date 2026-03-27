@@ -22,23 +22,24 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private static final String PAY_METHOD = "SIMULATE";
-
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
     private final PaymentRecordRepository paymentRecordRepository;
 
     @Transactional
-    public boolean simulatePay(Long orderId, Long userId) {
+    public boolean simulatePay(Long orderId, Long userId, String paymentMethod) {
         Optional<Order> opt = orderRepository.findById(orderId);
         if (opt.isEmpty()) return false;
         Order order = opt.get();
         if (!order.getUserId().equals(userId)) return false;
         if (!"PENDING".equals(order.getStatus())) return false;
 
+        // 设置支付方式，如果为空则默认为 WECHAT
+        String method = paymentMethod != null && !paymentMethod.isEmpty() ? paymentMethod : "WECHAT";
+        
         order.setStatus("PAID");
-        order.setPayMethod(PAY_METHOD);
+        order.setPayMethod(method);
         order.setPayTime(LocalDateTime.now());
         order.setPayAmount(order.getTotalAmount());
         orderRepository.save(order);
@@ -46,7 +47,7 @@ public class PaymentService {
         PaymentRecord record = PaymentRecord.builder()
                 .orderId(order.getId())
                 .orderNo(order.getOrderNo())
-                .payMethod(PAY_METHOD)
+                .payMethod(method)
                 .payAmount(order.getTotalAmount())
                 .payTime(LocalDateTime.now())
                 .build();

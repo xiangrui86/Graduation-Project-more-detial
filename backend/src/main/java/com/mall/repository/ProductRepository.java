@@ -31,15 +31,26 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // ===== 用户侧（公开接口）查询：需同时满足 商品上架 + 商家启用 =====
 
-    @Query("""
+    @Query(value = """
             SELECT p FROM Product p
+            WHERE p.onSale = true
+              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+            """,
+            countQuery = """
+            SELECT count(p) FROM Product p
             WHERE p.onSale = true
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """)
     Page<Product> findPublicOnSale(Pageable pageable);
 
-    @Query("""
+    @Query(value = """
             SELECT p FROM Product p
+            WHERE p.onSale = true
+              AND p.categoryId = :categoryId
+              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+            """,
+            countQuery = """
+            SELECT count(p) FROM Product p
             WHERE p.onSale = true
               AND p.categoryId = :categoryId
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
@@ -78,4 +89,36 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """)
     Optional<Product> findPublicById(Long id);
+
+    @Query(value = """
+            SELECT p FROM Product p
+            WHERE p.onSale = true
+              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.name LIKE %:keyword% OR (p.description IS NOT NULL AND p.description LIKE %:keyword%))
+            """,
+            countQuery = """
+            SELECT count(p) FROM Product p
+            WHERE p.onSale = true
+              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.name LIKE %:keyword% OR (p.description IS NOT NULL AND p.description LIKE %:keyword%))
+            """)
+    Page<Product> findPublicByNameContaining(String keyword, Pageable pageable);
+
+    // ===== 库存管理查询方法 =====
+
+    Page<Product> findByMerchantIdAndNameContaining(Long merchantId, String name, Pageable pageable);
+
+    Page<Product> findByMerchantIdAndStock(Long merchantId, Integer stock, Pageable pageable);
+
+    Page<Product> findByMerchantIdAndStockBetween(Long merchantId, Integer minStock, Integer maxStock, Pageable pageable);
+
+    Page<Product> findByMerchantIdAndStockGreaterThan(Long merchantId, Integer stock, Pageable pageable);
+
+    Page<Product> findByMerchantIdAndNameContainingAndStock(Long merchantId, String name, Integer stock, Pageable pageable);
+
+    Page<Product> findByMerchantIdAndNameContainingAndStockBetween(Long merchantId, String name, Integer minStock, Integer maxStock, Pageable pageable);
+
+    Page<Product> findByMerchantIdAndNameContainingAndStockGreaterThan(Long merchantId, String name, Integer stock, Pageable pageable);
+
+    List<Product> findByMerchantIdAndStockLessThanEqual(Long merchantId, Integer threshold);
 }

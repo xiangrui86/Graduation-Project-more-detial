@@ -37,13 +37,13 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
         userRepository.save(admin);
 
-        // 商家与商家账号
+        // 运营与运营账号
         Merchant m1 = Merchant.builder().name("运动之星体育用品").description("专业运动器材和装备销售").enabled(true).build();
         m1 = merchantRepository.save(m1);
         User merchant = User.builder()
                 .username("merchant")
                 .password(passwordEncoder.encode("merchant123"))
-                .nickname("商家")
+                .nickname("运营")
                 .role(Role.MERCHANT)
                 .merchantId(m1.getId())
                 .enabled(true)

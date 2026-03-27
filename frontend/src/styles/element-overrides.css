@@ -3,99 +3,207 @@
   --el-primary: var(--primary);
 }
 
-/* Card */
+/* ── Card ── */
 .el-card{
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-2);
   box-shadow: var(--shadow-sm);
+  transition: box-shadow .2s, transform .2s;
+}
+.el-card:hover{
+  box-shadow: var(--shadow-md);
 }
 .el-card__body{
-  padding: 16px;
+  padding: 18px;
 }
 
-/* Button */
+/* ── Button ── */
 .el-button{
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
+  transition: all .2s;
+  letter-spacing: .2px;
 }
 .el-button--primary{
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
-  border: none;
-  box-shadow: 0 10px 22px rgba(37, 99, 235, .18);
+  background: linear-gradient(135deg, #ff7a1f 0%, var(--primary) 100%);
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), .30);
 }
 .el-button--primary:hover,
 .el-button--primary:focus{
-  filter: brightness(1.02);
+  background: linear-gradient(135deg, #ff8c35 0%, var(--primary-dark) 100%);
+  border-color: var(--primary-dark);
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb), .40);
+  transform: translateY(-1px);
+}
+.el-button--primary:active{
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(var(--primary-rgb), .25);
+}
+.el-button--default{
+  border-color: var(--border);
+  color: var(--text-2);
+  background: var(--surface);
+}
+.el-button--default:hover{
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+.el-button--text{
+  color: var(--primary);
+  font-weight: 600;
+}
+.el-button--text:hover{
+  color: var(--primary-dark);
+  background: var(--primary-light);
 }
 
-/* Input */
+/* ── Input ── */
 .el-input__inner,
 .el-textarea__inner{
-  border-radius: 12px;
-  border-color: rgba(15, 23, 42, .14);
-  transition: box-shadow .15s ease, border-color .15s ease;
+  border-radius: var(--radius-sm);
+  border-color: var(--border);
+  color: var(--text);
+  background: var(--surface-2);
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s;
 }
 .el-input__inner:focus,
 .el-textarea__inner:focus{
-  border-color: rgba(37, 99, 235, .55);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, .14);
+  border-color: rgba(var(--primary-rgb), .6);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), .14);
+  background: #fff;
 }
 
-/* Dialog */
+/* ── Dialog ── */
 .el-dialog{
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-2);
 }
 .el-dialog__header{
-  padding: 16px 18px 10px;
+  padding: 20px 22px 12px;
+  border-bottom: 1px solid var(--border-2);
+  background: var(--surface-2);
 }
 .el-dialog__title{
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 16px;
   color: var(--text);
 }
 .el-dialog__body{
-  padding: 14px 18px 18px;
+  padding: 18px 22px;
+}
+.el-dialog__footer{
+  padding: 12px 22px 20px;
+  border-top: 1px solid var(--border-2);
+  background: var(--surface-2);
 }
 
-/* Table */
+/* ── Table ── */
 .el-table{
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   overflow: hidden;
+  font-size: 14px;
 }
 .el-table th{
-  background: rgba(15, 23, 42, .04);
+  background: var(--surface-3) !important;
   color: var(--text-2);
   font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .2px;
+  text-transform: uppercase;
 }
-.el-table--border, .el-table--group{
+.el-table--border,
+.el-table--group{
   border: 1px solid var(--border);
 }
-.el-table td, .el-table th.is-leaf{
-  border-bottom: 1px solid rgba(15, 23, 42, .08);
+.el-table td,
+.el-table th.is-leaf{
+  border-bottom: 1px solid var(--border-2);
+}
+.el-table__row:hover > td{
+  background: var(--primary-light) !important;
 }
 
-/* Form */
+/* ── Form ── */
 .el-form-item__label{
   color: var(--text-2);
   font-weight: 600;
+  font-size: 13px;
 }
 
-/* Message */
+/* ── Message ── */
 .el-message{
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-2);
+  font-weight: 500;
 }
 
-/* Menu (sidebar) */
+/* ── Menu (sidebar) ── */
 .el-menu{
   border-right: none;
 }
-.el-menu-item, .el-submenu__title{
-  border-radius: 12px;
-  margin: 6px 10px;
+.el-menu-item,
+.el-submenu__title{
+  border-radius: var(--radius-sm);
+  margin: 3px 8px;
+  height: 42px;
+  line-height: 42px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: background .15s, color .15s;
+}
+.el-menu-item:hover{
+  background: var(--surface-3) !important;
+  color: var(--text) !important;
 }
 .el-menu-item.is-active{
-  background: rgba(37, 99, 235, .12) !important;
+  background: var(--primary-light) !important;
   color: var(--primary) !important;
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+/* ── Tag ── */
+.el-tag{
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ── Badge ── */
+.el-badge__content{
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* ── Pagination ── */
+.el-pagination.is-background .el-pager li:not(.disabled).active{
+  background: var(--primary);
+}
+.el-pagination.is-background .el-pager li:not(.disabled):hover{
+  color: var(--primary);
+}
+
+/* ── Select dropdown ── */
+.el-select-dropdown__item.selected{
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ── Tabs ── */
+.el-tabs__active-bar{
+  background: var(--primary);
+  height: 3px;
+  border-radius: 2px;
+}
+.el-tabs__item.is-active{
+  color: var(--primary);
+  font-weight: 700;
+}
+.el-tabs__item:hover{
+  color: var(--primary);
 }

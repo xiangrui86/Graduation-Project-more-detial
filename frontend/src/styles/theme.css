@@ -1,22 +1,51 @@
 /* Global design tokens + base styles (Vue2 + Element UI) */
 :root{
-  --bg: #0b1220;
-  --surface: rgba(255,255,255,.86);
-  --surface-2: rgba(255,255,255,.72);
-  --border: rgba(15, 23, 42, .10);
-  --text: #0f172a;
-  --text-2: rgba(15, 23, 42, .72);
-  --muted: rgba(15, 23, 42, .56);
-  --primary: #2563eb;
-  --primary-2: #1d4ed8;
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --shadow-sm: 0 6px 16px rgba(15, 23, 42, .08);
-  --shadow-md: 0 10px 30px rgba(15, 23, 42, .12);
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
+  /* ── Page background ── */
+  --bg: #eaecf5;
+
+  /* ── Surfaces ── */
+  --surface: #ffffff;
+  --surface-2: #f8fafd;
+  --surface-3: #f1f4fb;
+
+  /* ── Borders ── */
+  --border: #e2e8f0;
+  --border-2: #f0f3f9;
+
+  /* ── Text ── */
+  --text:   #0f172a;
+  --text-2: #475569;
+  --muted:  #94a3b8;
+
+  /* ── Brand / Primary (orange) ── */
+  --primary:       #ff6900;
+  --primary-dark:  #e05500;
+  --primary-light: #fff4eb;
+  --primary-rgb:   255, 105, 0;
+
+  /* ── Role accent colors ── */
+  --admin-color:    #6366f1;   /* indigo  – 管理后台 */
+  --ops-color:      #10b981;   /* emerald – 运营中心 */
+
+  /* ── Status ── */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #6366f1;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.03);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.08), 0 3px 8px rgba(0,0,0,.04);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.10), 0 6px 16px rgba(0,0,0,.05);
+
+  /* ── Radius ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* ── Layout ── */
   --container: 1200px;
   --gap: 16px;
 }
@@ -28,11 +57,11 @@ html, body {
 body{
   margin: 0;
   color: var(--text);
-  background:
-    radial-gradient(1200px 800px at 20% 10%, rgba(37, 99, 235, .25), rgba(11, 18, 32, 0) 55%),
-    radial-gradient(900px 700px at 90% 20%, rgba(22, 163, 74, .16), rgba(11, 18, 32, 0) 55%),
-    radial-gradient(900px 700px at 70% 95%, rgba(217, 119, 6, .14), rgba(11, 18, 32, 0) 55%),
-    linear-gradient(180deg, #0b1220 0%, #0b1220 35%, #0f172a 100%);
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 15%, rgba(var(--primary-rgb),.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(99,102,241,.05) 0%, transparent 55%);
+  background-attachment: fixed;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -42,32 +71,37 @@ a{ color: inherit; }
 
 .app-shell{
   min-height: 100vh;
-  padding: 18px;
+  padding: 0;
 }
 
 .container{
-  max-width: var(--container);
+  max-width: 100%;
   margin: 0 auto;
+}
+
+.page-full-width {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .surface{
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .surface-2{
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(10px);
 }
 
 .page{
-  padding: 18px;
+  padding: 20px;
 }
 
 .page > h2,
@@ -86,12 +120,16 @@ a{ color: inherit; }
 }
 
 .page-block{
-  background: rgba(255,255,255,.72);
-  border: 1px solid var(--border);
+  background: #fff;
+  border: 1px solid var(--border-2);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 18px;
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(10px);
+  transition: box-shadow .2s;
+}
+
+.page-block:hover{
+  box-shadow: var(--shadow-md);
 }
 
 .page-block + .page-block{
@@ -149,12 +187,22 @@ a{ color: inherit; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 5px 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(255,255,255,.65);
+  background: var(--surface-2);
   color: var(--text-2);
   font-size: 12px;
+  font-weight: 500;
 }
 
 .muted{ color: var(--muted); }
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar{ width: 6px; height: 6px; }
+::-webkit-scrollbar-track{ background: transparent; }
+::-webkit-scrollbar-thumb{
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover{ background: #94a3b8; }

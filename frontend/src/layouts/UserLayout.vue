@@ -4,8 +4,12 @@
       <header class="topbar">
         <div class="left">
           <router-link to="/" class="brand">
-            <span class="mark" />
-            <span class="title">Sports Mall</span>
+            <svg class="mark" width="32" height="32" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="24" fill="#ff6900" />
+              <path d="M14 34c2-8 7-14 10-14s8 6 10 14" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="24" cy="20" r="5" fill="#fff" />
+            </svg>
+            <span class="title">SPORTS</span>
             <span class="badge">用户端</span>
           </router-link>
           <div class="links">
@@ -17,6 +21,7 @@
             <router-link to="/cart">购物车</router-link>
             <router-link to="/favorite">我的收藏</router-link>
             <router-link to="/orders">我的订单</router-link>
+            <router-link to="/profile">个人中心</router-link>
             <router-link to="/news">系统资讯</router-link>
             <router-link to="/announcements">最新公告</router-link>
           </div>
@@ -60,6 +65,7 @@ export default {
 <style scoped>
 .user-shell {
   overflow: hidden;
+  border-radius: var(--radius-xl);
 }
 .topbar {
   position: sticky;
@@ -69,15 +75,17 @@ export default {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(14px);
+  padding: 0 20px;
+  height: 62px;
+  border-bottom: 1px solid var(--border-2);
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 .left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   min-width: 0;
 }
 .brand {
@@ -89,57 +97,70 @@ export default {
   white-space: nowrap;
 }
 .mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #2563eb 0%, #22c55e 100%);
-  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.18);
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 8px rgba(255,105,0,.30));
+  transition: filter .2s;
+}
+.brand:hover .mark {
+  filter: drop-shadow(0 4px 12px rgba(255,105,0,.45));
 }
 .title {
   font-weight: 900;
-  letter-spacing: 0.2px;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  color: var(--text);
+  background: linear-gradient(135deg, #ff6900 0%, #ff4d00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .badge {
-  font-size: 12px;
-  color: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--primary);
+  border: 1.5px solid rgba(var(--primary-rgb), .3);
+  padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--primary-light);
+  font-weight: 600;
 }
 .links {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 2px;
   flex-wrap: wrap;
   min-width: 0;
 }
 .links a {
-  color: rgba(15, 23, 42, 0.72);
+  color: var(--text-2);
   text-decoration: none;
-  padding: 8px 10px;
-  border-radius: 12px;
-  transition: background 0.15s ease, color 0.15s ease;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background .15s ease, color .15s ease;
+  white-space: nowrap;
 }
 .links a:hover {
-  background: rgba(15, 23, 42, 0.06);
-  color: rgba(15, 23, 42, 0.92);
+  background: var(--surface-3);
+  color: var(--text);
 }
 .links a.router-link-active {
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
-  font-weight: 800;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 700;
 }
 .right {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 .dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(34, 197, 89, 0.18);
 }
 </style>

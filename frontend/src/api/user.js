@@ -10,6 +10,11 @@ export function getProfile() {
   return request.get("/user/profile");
 }
 
+/** 更新当前登录用户资料 */
+export function updateProfile(data) {
+  return request.put("/user/profile", data);
+}
+
 /** 获取购物车列表 */
 export function getCart() {
   return request.get("/user/cart");
@@ -66,8 +71,13 @@ export function getOrderDetail(id) {
 }
 
 /** 支付订单 */
-export function payOrder(id) {
-  return request.post(`/user/order/${id}/pay`);
+export function payOrder(id, data) {
+  return request.post(`/user/order/${id}/pay`, data);
+}
+
+/** 取消订单（收货前） */
+export function cancelOrder(id) {
+  return request.post(`/user/order/${id}/cancel`);
 }
 
 /** 确认收货 */
@@ -75,9 +85,30 @@ export function confirmReceive(id) {
   return request.post(`/user/order/${id}/confirm-receive`);
 }
 
+/** 完成订单（评价后） */
+export function completeOrder(id) {
+  return request.post(`/user/order/${id}/complete`);
+}
+
 /** 发起退款申请 */
 export function requestRefund(id, reason) {
   return request.post(`/user/order/${id}/refund-request`, { reason });
+}
+
+/** 针对单个订单项申请退款 */
+export function requestItemRefund(orderId, itemId, data) {
+  return request.post(
+    `/user/order/${orderId}/items/${itemId}/refund-request`,
+    data,
+  );
+}
+
+/** 批量申请多个订单项退款 */
+export function batchRefundItems(orderId, data) {
+  return request.post(
+    `/user/order/${orderId}/items/batch-refund-request`,
+    data,
+  );
 }
 
 /** 发表商品评价 */
@@ -92,4 +123,39 @@ export function getUserChatList() {
 /** 发送用户聊天消息 */
 export function sendUserChat(data) {
   return request.post("/user/chat/send", data);
+}
+
+/** 获取收货地址列表 */
+export function getAddresses() {
+  return request.get("/user/address");
+}
+
+/** 获取收货地址详情 */
+export function getAddress(id) {
+  return request.get(`/user/address/${id}`);
+}
+
+/** 新增收货地址 */
+export function createAddress(data) {
+  return request.post("/user/address", data);
+}
+
+/** 更新收货地址 */
+export function updateAddress(id, data) {
+  return request.put(`/user/address/${id}`, data);
+}
+
+/** 删除收货地址 */
+export function deleteAddress(id) {
+  return request.delete(`/user/address/${id}`);
+}
+
+/** 设为默认收货地址 */
+export function setDefaultAddress(id) {
+  return request.put(`/user/address/${id}/default`);
+}
+
+/** 获取默认收货地址 */
+export function getDefaultAddress() {
+  return request.get("/user/address/default");
 }

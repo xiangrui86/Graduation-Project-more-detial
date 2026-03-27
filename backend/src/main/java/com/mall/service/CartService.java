@@ -26,13 +26,19 @@ public class CartService {
     public CartItem add(Long userId, Long productId, int quantity) {
         Optional<Product> p = productRepository.findById(productId);
         if (p.isEmpty() || !p.get().getOnSale()) throw new RuntimeException("商品不存在或已下架");
+        
         Optional<CartItem> existing = cartItemRepository.findByUserIdAndProductId(userId, productId);
+        
         if (existing.isPresent()) {
             CartItem c = existing.get();
             c.setQuantity(c.getQuantity() + quantity);
             return cartItemRepository.save(c);
         }
-        CartItem c = CartItem.builder().userId(userId).productId(productId).quantity(quantity).build();
+        CartItem c = CartItem.builder()
+                .userId(userId)
+                .productId(productId)
+                .quantity(quantity)
+                .build();
         return cartItemRepository.save(c);
     }
 

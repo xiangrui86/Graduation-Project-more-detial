@@ -6,6 +6,7 @@ import com.mall.service.CollaborativeFilteringService;
 import com.mall.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,16 +21,43 @@ public class PubProductController {
     private final ProductService productService;
     private final CollaborativeFilteringService collaborativeFilteringService;
 
-    /** 分页查询公开商品列表，可按分类过滤。 */
+    /** 分页查询公开商品列表，可按分类过滤，可搜索，可排序。 */
     @GetMapping("/products")
     public Result<?> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
-            @RequestParam(required = false) Long categoryId) {
-        if (categoryId != null) {
-            return Result.ok(productService.listPublicByCategory(categoryId, PageRequest.of(page, size)));
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Sort sortSpec = buildSort(sort, direction);
+        PageRequest pageable = sortSpec != null
+                ? PageRequest.of(page, size, sortSpec)
+                : PageRequest.of(page, size);
+
+        if (search != null && !search.trim().isEmpty()) {
+            return Result.ok(productService.searchPublicProducts(search.trim(), pageable));
         }
-        return Result.ok(productService.listPublicAll(PageRequest.of(page, size)));
+        if (categoryId != null) {
+            return Result.ok(productService.listPublicByCategory(categoryId, pageable));
+        }
+        return Result.ok(productService.listPublicAll(pageable));
+    }
+
+    /** 根据前端传参构建 JPA Sort 对象。 */
+    private Sort buildSort(String sort, String direction) {
+        if (sort == null || sort.trim().isEmpty()) return null;
+        Sort.Direction dir = "desc".equalsIgnoreCase(direction)
+                ? Sort.Direction.DESC : Sort.Direction.ASC;
+        // 映射前端字段名 → 实体字段名
+        String field = switch (sort) {
+            case "price" -> "price";
+            case "sales" -> "sales";
+            case "createdAt" -> "createdAt";
+            default -> null;
+        };
+        return field != null ? Sort.by(dir, field) : null;
     }
 
     /** 查询公开商品详情。 */

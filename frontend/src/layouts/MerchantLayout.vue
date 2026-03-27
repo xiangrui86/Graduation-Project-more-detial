@@ -6,7 +6,7 @@
           <span class="mark" />
           <div class="meta">
             <div class="title">Sports Mall</div>
-            <div class="sub">商家中心</div>
+            <div class="sub">运营中心</div>
           </div>
         </div>
         <div class="actions">
@@ -21,6 +21,7 @@
           <el-menu :default-active="$route.path" router class="menu">
             <el-menu-item index="/merchant">数据报表</el-menu-item>
             <el-menu-item index="/merchant/products">商品管理</el-menu-item>
+            <el-menu-item index="/merchant/inventory">库存管理</el-menu-item>
             <el-menu-item index="/merchant/orders">交易管理</el-menu-item>
           </el-menu>
         </aside>
@@ -46,57 +47,56 @@ export default {
 </script>
 
 <style scoped>
-.shell {
-  overflow: hidden;
-}
+.shell { overflow: hidden; }
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(14px);
+  padding: 0 20px;
+  height: 60px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #22c55e 0%, #2563eb 100%);
-  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.16);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #34d399 0%, #10b981 60%, #059669 100%);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
-.meta {
-  line-height: 1.1;
-}
-.title {
+.mark::after {
+  content: "O";
+  color: #fff;
+  font-size: 15px;
   font-weight: 900;
-  letter-spacing: 0.2px;
+  letter-spacing: -0.5px;
 }
-.sub {
-  font-size: 12px;
-  color: rgba(15, 23, 42, 0.62);
-  margin-top: 2px;
-}
+.meta { line-height: 1.2; }
+.title { font-weight: 900; font-size: 15px; letter-spacing: 0.2px; color: var(--text); }
+.sub { font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 500; }
+
 .body {
   display: flex;
   min-height: calc(100vh - 18px * 2 - 60px);
 }
 .aside {
-  width: 240px;
-  padding: 14px 10px;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.55);
+  width: 224px;
+  padding: 12px 8px;
+  border-right: 1px solid rgba(15, 23, 42, 0.06);
+  background: linear-gradient(180deg, rgba(240,253,250,1) 0%, rgba(236,253,245,1) 100%);
+  flex-shrink: 0;
 }
-.menu {
-  background: transparent;
-}
-.main {
-  flex: 1;
-  min-width: 0;
-}
+.menu { background: transparent; }
+.main { flex: 1; min-width: 0; }
 </style>

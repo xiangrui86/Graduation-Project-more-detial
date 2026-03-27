@@ -1,6 +1,7 @@
 package com.mall.entity;
 
 import com.mall.common.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class User {
     private String username;
 
     @Column(nullable = false, length = 128)
+    @JsonIgnore
     private String password;
 
     @Column(length = 32)
@@ -34,11 +36,28 @@ public class User {
     @Column(length = 20)
     private String phone;
 
+    @Column(length = 255)
+    private String avatar;
+
+    /** 性别：MALE/FEMALE/OTHER */
+    @Column(length = 10)
+    private String gender;
+
+    /** 收货人信息 */
+    @Column(length = 32)
+    private String receiverName;
+
+    @Column(length = 20)
+    private String receiverPhone;
+
+    @Column(length = 255)
+    private String receiverAddress;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role;
 
-    /** 商家关联：仅当 role=MERCHANT 时有效 */
+    /** 运营关联：仅当 role=MERCHANT 时有效 */
     @Column(name = "merchant_id")
     private Long merchantId;
 
@@ -50,6 +69,10 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private java.util.List<com.mall.entity.Address> addresses;
 
     @PrePersist
     void prePersist() {

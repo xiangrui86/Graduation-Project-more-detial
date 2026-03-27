@@ -8,7 +8,7 @@
     <el-table :data="list" border>
       <el-table-column prop="orderNo" label="订单号" width="180" />
       <el-table-column prop="userId" label="用户ID" width="80" />
-      <el-table-column prop="merchantId" label="商家ID" width="80" />
+      <el-table-column prop="merchantId" label="运营ID" width="80" />
       <el-table-column prop="totalAmount" label="金额" width="100" />
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="scope">
