@@ -119,16 +119,6 @@ const routes = [
         component: () => import("@/views/admin/Categories.vue"),
       },
       {
-        path: "products",
-        name: "AdminProducts",
-        component: () => import("@/views/admin/Products.vue"),
-      },
-      {
-        path: "products/:id/detail",
-        name: "AdminProductDetail",
-        component: () => import("@/views/admin/ProductDetail.vue"),
-      },
-      {
         path: "orders",
         name: "AdminOrders",
         component: () => import("@/views/admin/Orders.vue"),
@@ -159,6 +149,11 @@ const routes = [
         path: "products/:id/detail",
         name: "MerchantProductDetail",
         component: () => import("@/views/merchant/ProductDetail.vue"),
+      },
+      {
+        path: "inventory",
+        name: "MerchantInventory",
+        component: () => import("@/views/merchant/Inventory.vue"),
       },
       {
         path: "orders",

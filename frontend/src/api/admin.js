@@ -75,51 +75,6 @@ export function deleteCategory(id) {
   return request.delete(`/admin/category/${id}`);
 }
 
-/** 查询商品列表 */
-export function getProducts(params) {
-  return request.get("/admin/product", { params });
-}
-
-/** 查询商品详情 */
-export function getProduct(id) {
-  return request.get(`/admin/product/${id}`);
-}
-
-/** 新增商品 */
-export function createProduct(data) {
-  return request.post("/admin/product", data);
-}
-
-/** 更新商品 */
-export function updateProduct(id, data) {
-  return request.put(`/admin/product/${id}`, data);
-}
-
-/** 删除商品 */
-export function deleteProduct(id) {
-  return request.delete(`/admin/product/${id}`);
-}
-
-/** 查询商品规格列表 */
-export function getProductSpecs(productId) {
-  return request.get(`/admin/product-specs/product/${productId}`);
-}
-
-/** 创建商品规格 */
-export function createProductSpec(productId, data) {
-  return request.post(`/admin/product-specs/${productId}`, data);
-}
-
-/** 更新商品规格 */
-export function updateProductSpec(specId, data) {
-  return request.put(`/admin/product-specs/${specId}`, data);
-}
-
-/** 删除商品规格 */
-export function deleteProductSpec(specId) {
-  return request.delete(`/admin/product-specs/${specId}`);
-}
-
 /** 查询订单列表 */
 export function getOrders(params) {
   return request.get("/admin/order", { params });

@@ -559,24 +559,50 @@ export default {
 
       this.batchUpdating = true;
       try {
-        // 这里需要根据选择的目标商品构建调整数据
-        // 暂时实现简单的逻辑，实际应该根据筛选条件获取商品列表
+        // 获取所有商品数据
+        const allRes = await getInventory({ page: 0, size: 10000 });
+        if (allRes.code !== 200) {
+          this.$message.error("获取商品列表失败");
+          return;
+        }
+
+        const allProducts = allRes.data.content;
         const stockUpdates = {};
 
-        // 简化实现：获取当前页面的商品进行批量调整
-        this.inventoryList.forEach((product) => {
-          let newStock = product.stock;
+        // 根据应用范围筛选商品并计算新库存
+        allProducts.forEach((product) => {
+          let shouldApply = false;
 
-          if (this.batchForm.adjustType === "fixed") {
-            newStock += this.batchForm.adjustValue;
-          } else {
-            newStock = Math.round(
-              newStock * (1 + this.batchForm.adjustValue / 100),
-            );
+          // 检查是否应该应用调整
+          if (this.batchForm.targetProducts.includes("all")) {
+            shouldApply = true;
+          } else if (
+            this.batchForm.targetProducts.includes("low_stock") &&
+            product.stock > 0 &&
+            product.stock <= 10
+          ) {
+            shouldApply = true;
+          } else if (
+            this.batchForm.targetProducts.includes("out_of_stock") &&
+            product.stock === 0
+          ) {
+            shouldApply = true;
           }
 
-          if (newStock >= 0) {
-            stockUpdates[product.id] = newStock;
+          if (shouldApply) {
+            let newStock = product.stock;
+
+            if (this.batchForm.adjustType === "fixed") {
+              newStock += this.batchForm.adjustValue;
+            } else {
+              newStock = Math.round(
+                newStock * (1 + this.batchForm.adjustValue / 100),
+              );
+            }
+
+            if (newStock >= 0) {
+              stockUpdates[product.id] = newStock;
+            }
           }
         });
 
@@ -585,15 +611,29 @@ export default {
           return;
         }
 
-        const res = await batchUpdateStock(stockUpdates);
-        if (res.code === 200) {
-          this.batchUpdateDialog = false;
-          this.$message.success("批量调整库存成功");
-          this.loadInventory();
-          this.loadStatistics();
-        } else {
-          this.$message.error(res.message || "批量调整失败");
-        }
+        this.$confirm(
+          `确认批量调整 ${Object.keys(stockUpdates).length} 个商品的库存吗？`,
+          "警告",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          },
+        )
+          .then(async () => {
+            const res = await batchUpdateStock(stockUpdates);
+            if (res.code === 200) {
+              this.batchUpdateDialog = false;
+              this.$message.success("批量调整库存成功");
+              this.loadInventory();
+              this.loadStatistics();
+            } else {
+              this.$message.error(res.message || "批量调整失败");
+            }
+          })
+          .catch(() => {
+            // 用户取消
+          });
       } catch (error) {
         this.$message.error("批量调整失败");
       } finally {
