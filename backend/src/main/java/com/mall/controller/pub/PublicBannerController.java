@@ -17,6 +17,6 @@ public class PublicBannerController {
 
     @GetMapping
     public List<BannerDTO> list() {
-        return bannerService.listAll();
+        return bannerService.listPublic();
     }
 }

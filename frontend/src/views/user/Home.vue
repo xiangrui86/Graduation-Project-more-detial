@@ -349,6 +349,7 @@ import {
   getAnnouncements,
   getCategories,
   getProducts,
+  getBanners,
 } from "@/api/pub";
 import { addCart } from "@/api/user";
 
@@ -436,13 +437,23 @@ export default {
   },
   methods: {
     loadData() {
-      // 获取推荐商品作为轮播商品
-      getProducts({ page: 0, size: 5 }).then((res) => {
-        if (res.data && res.data.content) {
-          this.featuredProducts = res.data.content;
+      // 获取运营配置的首页轮播图
+      getBanners()
+        .then((res) => {
+          if (res.data && res.data.length) {
+            this.featuredProducts = res.data;
+          } else {
+            return getProducts({ page: 0, size: 5 });
+          }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.content) {
+            this.featuredProducts = res.data.content;
+          }
+        })
+        .finally(() => {
           this.$nextTick(() => this.startCarousel());
-        }
-      });
+        });
 
       getNewArrivals(8).then((res) => {
         if (res.data) this.newList = res.data;

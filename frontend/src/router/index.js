@@ -169,11 +169,6 @@ const routes = [
         name: "MerchantOrders",
         component: () => import("@/views/merchant/Orders.vue"),
       },
-      {
-        path: "banner",
-        name: "MerchantBanner",
-        component: () => import("@/views/merchant/Banner.vue"),
-      },
     ],
   },
 ];
