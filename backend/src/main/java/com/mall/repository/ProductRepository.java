@@ -34,11 +34,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = """
             SELECT p FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """,
             countQuery = """
             SELECT count(p) FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """)
     Page<Product> findPublicOnSale(Pageable pageable);
@@ -46,12 +48,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = """
             SELECT p FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.categoryId = :categoryId
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """,
             countQuery = """
             SELECT count(p) FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.categoryId = :categoryId
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """)
@@ -60,6 +64,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             SELECT p FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.isNew = true
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             ORDER BY p.createdAt DESC
@@ -69,6 +74,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             SELECT p FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             ORDER BY p.sales DESC
             """)
@@ -77,6 +83,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             SELECT p FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.id IN :ids
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """)
@@ -86,6 +93,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
             WHERE p.id = :id
               AND p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
             """)
     Optional<Product> findPublicById(Long id);
@@ -93,16 +101,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = """
             SELECT p FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
               AND (p.name LIKE %:keyword% OR (p.description IS NOT NULL AND p.description LIKE %:keyword%))
             """,
             countQuery = """
             SELECT count(p) FROM Product p
             WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
               AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
               AND (p.name LIKE %:keyword% OR (p.description IS NOT NULL AND p.description LIKE %:keyword%))
             """)
     Page<Product> findPublicByNameContaining(String keyword, Pageable pageable);
+
+    Page<Product> findByReviewStatus(String reviewStatus, Pageable pageable);
 
     // ===== 库存管理查询方法 =====
 

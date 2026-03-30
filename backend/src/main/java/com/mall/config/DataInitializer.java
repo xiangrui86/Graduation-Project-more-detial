@@ -72,19 +72,19 @@ public class DataInitializer implements CommandLineRunner {
         Product p1 = Product.builder().merchantId(m1.getId()).categoryId(c1.getId()).name("专业足球")
                 .description("标准比赛用足球，采用高级PU材料").image("/api/images/football.jpg")
                 .price(new BigDecimal("299")).originalPrice(new BigDecimal("399"))
-                .stock(100).sales(0).onSale(true).isNew(true).build();
+                .stock(100).sales(0).onSale(true).reviewStatus("APPROVED").isNew(true).build();
         Product p2 = Product.builder().merchantId(m1.getId()).categoryId(c2.getId()).name("篮球")
                 .description("室内外通用篮球，防滑耐磨").image("/api/images/basketball.jpg")
-                .price(new BigDecimal("199")).originalPrice(new BigDecimal("299")).stock(80).sales(0).onSale(true).isNew(false).build();
+                .price(new BigDecimal("199")).originalPrice(new BigDecimal("299")).stock(80).sales(0).onSale(true).reviewStatus("APPROVED").isNew(false).build();
         Product p3 = Product.builder().merchantId(m1.getId()).categoryId(c3.getId()).name("跑步机")
                 .description("家用电动跑步机，多档位调节").image("/api/images/treadmill.jpg")
-                .price(new BigDecimal("1899")).originalPrice(new BigDecimal("2499")).stock(20).sales(5).onSale(true).isNew(true).build();
+                .price(new BigDecimal("1899")).originalPrice(new BigDecimal("2499")).stock(20).sales(5).onSale(true).reviewStatus("APPROVED").isNew(true).build();
         Product p4 = Product.builder().merchantId(m1.getId()).categoryId(c4.getId()).name("羽毛球拍")
                 .description("专业羽毛球拍，轻量化设计").image("/api/images/badminton.jpg")
-                .price(new BigDecimal("399")).originalPrice(new BigDecimal("599")).stock(60).sales(3).onSale(true).isNew(false).build();
+                .price(new BigDecimal("399")).originalPrice(new BigDecimal("599")).stock(60).sales(3).onSale(true).reviewStatus("APPROVED").isNew(false).build();
         Product p5 = Product.builder().merchantId(m1.getId()).categoryId(c5.getId()).name("乒乓球拍套装")
                 .description("防守型乒乓球拍套装，含球和拍包").image("/api/images/pingpong.jpg")
-                .price(new BigDecimal("299")).originalPrice(new BigDecimal("499")).stock(50).sales(2).onSale(true).isNew(true).build();
+                .price(new BigDecimal("299")).originalPrice(new BigDecimal("499")).stock(50).sales(2).onSale(true).reviewStatus("APPROVED").isNew(true).build();
         productRepository.saveAll(List.of(p1, p2, p3, p4, p5));
 
         // 公告

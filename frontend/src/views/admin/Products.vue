@@ -2,17 +2,9 @@
   <div class="page-block admin-products">
     <div class="page-header">
       <div class="header-content">
-        <h2 class="page-title">商品管理</h2>
-        <p class="page-subtitle">管理系统中所有商品</p>
+        <h2 class="page-title">商品审核</h2>
+        <p class="page-subtitle">审核商家提交的商品，拒绝后退回修改</p>
       </div>
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="openCreateDialog"
-        class="add-btn"
-      >
-        新增商品
-      </el-button>
     </div>
 
     <el-table
@@ -54,17 +46,19 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="审核状态" width="140">
+        <template slot-scope="scope">
+          <el-tag :type="reviewTagType(scope.row.reviewStatus)" size="small">
+            {{ reviewLabel(scope.row.reviewStatus) }}
+          </el-tag>
+          <div v-if="scope.row.reviewStatus === 'REJECTED' && scope.row.reviewReason" class="review-reason">
+            {{ scope.row.reviewReason }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="260" fixed="right">
         <template slot-scope="scope">
           <div class="action-buttons">
-            <el-button
-              type="text"
-              size="small"
-              @click="editProduct(scope.row)"
-              class="edit-btn"
-            >
-              编辑
-            </el-button>
             <el-button
               type="text"
               size="small"
@@ -74,12 +68,22 @@
               详情
             </el-button>
             <el-button
+              v-if="scope.row.reviewStatus !== 'APPROVED'"
               type="text"
               size="small"
-              @click="deleteProduct(scope.row.id)"
-              class="delete-btn"
+              @click="approveProduct(scope.row)"
+              class="approve-btn"
             >
-              删除
+              通过
+            </el-button>
+            <el-button
+              v-if="scope.row.reviewStatus !== 'APPROVED'"
+              type="text"
+              size="small"
+              @click="rejectProduct(scope.row)"
+              class="reject-btn"
+            >
+              拒绝
             </el-button>
           </div>
         </template>
@@ -95,38 +99,23 @@
         layout="prev, pager, next, jumper"
       />
     </div>
-
-    <!-- 商品创建/编辑弹窗 -->
-    <ProductUploadDialog
-      :visible.sync="showCreateDialog"
-      :editing-product="editingProduct"
-      @submit="handleProductSubmit"
-      @close="handleDialogClose"
-    />
   </div>
 </template>
 
 <script>
 import {
   getProducts,
-  createProduct,
-  updateProduct,
-  deleteProduct,
+  approveProduct,
+  rejectProduct,
 } from "@/api/admin";
-import ProductUploadDialog from "@/components/merchant/ProductUploadDialog.vue";
 
 export default {
   name: "AdminProducts",
-  components: {
-    ProductUploadDialog,
-  },
+  components: {},
   data() {
     return {
       list: [],
-      categories: [],
       loading: false,
-      showCreateDialog: false,
-      editingProduct: null,
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -163,46 +152,55 @@ export default {
         });
     },
 
-    openCreateDialog() {
-      this.editingProduct = null;
-      this.showCreateDialog = true;
+
+    async approveProduct(product) {
+      try {
+        await approveProduct(product.id);
+        this.$message.success("商品已通过审核");
+        this.loadProducts(this.currentPage - 1);
+      } catch (error) {
+        this.$message.error(error.response?.data?.message || "审核失败");
+      }
     },
 
-    editProduct(product) {
-      this.editingProduct = { ...product };
-      this.showCreateDialog = true;
+    async rejectProduct(product) {
+      try {
+        const reason = await this.$prompt("请输入拒绝原因", "审核不通过", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          inputPlaceholder: "请输入拒绝原因",
+          inputPattern: /\S+/, 
+          inputErrorMessage: "请输入拒绝原因",
+        });
+        await rejectProduct(product.id, reason.value);
+        this.$message.success("商品已退回修改");
+        this.loadProducts(this.currentPage - 1);
+      } catch (error) {
+        if (error === "cancel") return;
+        this.$message.error(error.response?.data?.message || "操作失败");
+      }
     },
 
     viewDetail(product) {
       this.$router.push(`/admin/products/${product.id}/detail`);
     },
 
-    async handleProductSubmit(formData) {
-      try {
-        if (this.editingProduct) {
-          await updateProduct(this.editingProduct.id, formData);
-          this.$message.success("商品编辑成功");
-        } else {
-          await createProduct(formData);
-          this.$message.success("商品创建成功");
-        }
-        this.showCreateDialog = false;
-        this.loadProducts(this.currentPage - 1);
-      } catch (error) {
-        this.$message.error(
-          error.response?.data?.message || "操作失败，请重试"
-        );
-      }
-    },
-
-    handleDialogClose() {
-      this.editingProduct = null;
-      this.showCreateDialog = false;
-    },
 
     handlePageChange(page) {
       this.currentPage = page;
       this.loadProducts(page - 1);
+    },
+
+    reviewTagType(status) {
+      if (status === "APPROVED") return "success";
+      if (status === "REJECTED") return "danger";
+      return "warning";
+    },
+
+    reviewLabel(status) {
+      if (status === "APPROVED") return "已通过";
+      if (status === "REJECTED") return "已拒绝";
+      return "待审核";
     },
 
     deleteProduct(id) {

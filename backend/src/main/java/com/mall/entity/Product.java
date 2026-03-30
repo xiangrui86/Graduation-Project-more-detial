@@ -78,6 +78,13 @@ public class Product {
     private Boolean onSale = true;
 
     @Builder.Default
+    @Column(name = "review_status", length = 20)
+    private String reviewStatus = "PENDING";
+
+    @Column(name = "review_reason", length = 512)
+    private String reviewReason;
+
+    @Builder.Default
     @Column(name = "is_new")
     private Boolean isNew = false;
 

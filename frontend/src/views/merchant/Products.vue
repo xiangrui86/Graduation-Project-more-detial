@@ -54,6 +54,21 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="审核状态" width="140">
+        <template slot-scope="scope">
+          <el-tag :type="reviewTagType(scope.row.reviewStatus)" size="small">
+            {{ reviewLabel(scope.row.reviewStatus) }}
+          </el-tag>
+          <div
+            v-if="
+              scope.row.reviewStatus === 'REJECTED' && scope.row.reviewReason
+            "
+            class="review-reason"
+          >
+            {{ scope.row.reviewReason }}
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">
         <template slot-scope="scope">
           <div class="action-buttons">
@@ -163,6 +178,18 @@ export default {
         });
     },
 
+    reviewTagType(status) {
+      if (status === "APPROVED") return "success";
+      if (status === "REJECTED") return "danger";
+      return "warning";
+    },
+
+    reviewLabel(status) {
+      if (status === "APPROVED") return "已通过";
+      if (status === "REJECTED") return "已拒绝";
+      return "待审核";
+    },
+
     openCreateDialog() {
       this.editingProduct = null;
       this.showCreateDialog = true;
@@ -190,7 +217,7 @@ export default {
         this.loadProducts(this.currentPage - 1);
       } catch (error) {
         this.$message.error(
-          error.response?.data?.message || "操作失败，请重试"
+          error.response?.data?.message || "操作失败，请重试",
         );
       }
     },

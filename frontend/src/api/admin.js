@@ -126,3 +126,23 @@ export function deleteReview(reviewId) {
 export function deleteReviews(reviewIds) {
   return request.post("/admin/review/batch-delete", reviewIds);
 }
+
+/** 管理端商品审核列表 */
+export function getProducts(params) {
+  return request.get("/admin/product", { params });
+}
+
+/** 管理端商品详情 */
+export function getProduct(id) {
+  return request.get(`/admin/product/${id}`);
+}
+
+/** 管理端审核通过 */
+export function approveProduct(id) {
+  return request.post(`/admin/product/${id}/approve`);
+}
+
+/** 管理端审核不通过 */
+export function rejectProduct(id, reason) {
+  return request.post(`/admin/product/${id}/reject`, { reason });
+}

@@ -16,6 +16,14 @@
       <el-tab-pane label="商品详情" name="detail">
         <div style="max-width: 800px; margin-top: 20px">
           <h3>{{ productName || '商品详情' }}</h3>
+          <div v-if="product.reviewStatus" style="margin-bottom: 12px">
+            <el-tag :type="reviewTagType(product.reviewStatus)" size="medium">
+              {{ reviewLabel(product.reviewStatus) }}
+            </el-tag>
+            <div v-if="product.reviewStatus === 'REJECTED' && product.reviewReason" style="margin-top: 8px; color: #f56c6c;">
+              拒绝原因：{{ product.reviewReason }}
+            </div>
+          </div>
           <el-form :model="detailForm" label-width="100px">
             <el-form-item label="详细描述">
               <el-input
@@ -239,6 +247,7 @@ export default {
     return {
       productId: null,
       productName: "",
+      product: {},
       activeTab: "detail",
       detailForm: {
         detailDescription: "",
@@ -276,6 +285,7 @@ export default {
       getProduct(this.productId)
         .then((res) => {
           const product = res.data;
+          this.product = product;
           this.productName = product.name;
           this.detailForm = {
             detailDescription: product.detailDescription || "",
@@ -392,6 +402,16 @@ export default {
         this.specForm.image = response.data.url;
         this.$message.success("图片上传成功");
       }
+    },
+    reviewTagType(status) {
+      if (status === "APPROVED") return "success";
+      if (status === "REJECTED") return "danger";
+      return "warning";
+    },
+    reviewLabel(status) {
+      if (status === "APPROVED") return "已通过";
+      if (status === "REJECTED") return "已拒绝";
+      return "待审核";
     },
     handleUploadError(err) {
       this.$message.error("图片上传失败");

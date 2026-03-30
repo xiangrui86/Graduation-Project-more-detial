@@ -24,6 +24,7 @@
             <el-menu-item index="/admin/merchants">运营管理</el-menu-item>
             <el-menu-item index="/admin/categories">分类管理</el-menu-item>
             <el-menu-item index="/admin/orders">交易管理</el-menu-item>
+            <el-menu-item index="/admin/products">商品审核</el-menu-item>
             <el-menu-item index="/admin/news">资讯管理</el-menu-item>
             <el-menu-item index="/admin/reviews">评价管理</el-menu-item>
           </el-menu>

@@ -29,9 +29,9 @@ public class ProductService {
         return productRepository.findPublicById(id);
     }
 
-    /** 管理端商品分页列表（仅上架商品）。 */
+    /** 管理端商品分页列表。 */
     public Page<Product> listAll(Pageable pageable) {
-        return productRepository.findByOnSaleTrue(pageable);
+        return productRepository.findAll(pageable);
     }
 
     /** 管理端按分类查询商品。 */
@@ -39,12 +39,12 @@ public class ProductService {
         return productRepository.findByCategoryIdAndOnSaleTrue(categoryId, pageable);
     }
 
-    /** 用户侧商品列表：仅返回“上架且运营启用”的商品 */
+    /** 用户侧商品列表：仅返回“上架且运营启用”且审核通过的商品 */
     public Page<Product> listPublicAll(Pageable pageable) {
         return productRepository.findPublicOnSale(pageable);
     }
 
-    /** 用户侧分类商品列表：仅返回“上架且运营启用”的商品 */
+    /** 用户侧分类商品列表：仅返回“上架且运营启用”且审核通过的商品 */
     public Page<Product> listPublicByCategory(Long categoryId, Pageable pageable) {
         return productRepository.findPublicByCategory(categoryId, pageable);
     }

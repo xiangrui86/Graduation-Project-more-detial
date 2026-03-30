@@ -1,0 +1,234 @@
+{
+  "main": {
+    "id": "d31663b22e5068e4",
+    "type": "split",
+    "children": [
+      {
+        "id": "5bd4fa79ada9b1f5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "400a58b0a4f56924",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "zh/content/数据库设计.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "数据库设计"
+            }
+          },
+          {
+            "id": "bc03a9d74c1eeb88",
+            "type": "leaf",
+            "state": {
+              "type": "bases",
+              "state": {
+                "file": "未命名 1.base",
+                "viewName": "表格"
+              },
+              "icon": "lucide-table",
+              "title": "未命名 1"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a5debbfb9e1f6375",
+    "type": "split",
+    "children": [
+      {
+        "id": "53a0bcb6add329ea",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "054ff79c1890938d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "b1eaba2be17b9715",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "eb7ea0ee5ffc8fa3",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "95a31e07e9b9074a",
+    "type": "split",
+    "children": [
+      {
+        "id": "082ccc74042e42af",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "33084d4aa50ad9e1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "未命名 1.base",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "未命名 1 的反向链接列表"
+            }
+          },
+          {
+            "id": "c308ffa494d38a19",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "zh/content/前端架构详解/组件架构设计.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "组件架构设计 的出链列表"
+            }
+          },
+          {
+            "id": "4cf88776e04ae2a1",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "4505591b5824573a",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "61b4d1d873d422d8",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "zh/content/前端架构详解/组件架构设计.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "组件架构设计 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "054ff79c1890938d",
+  "lastOpenFiles": [
+    "未命名.base",
+    "未命名 1.base",
+    "未命名 2.base",
+    "未命名 3.base",
+    "未命名.canvas",
+    "11.md",
+    "zh/content/数据库设计.md",
+    "未命名",
+    "zh/content/后端架构详解/数据访问层/订单数据访问层.md",
+    "zh/content/后端架构详解/数据访问层/地址数据访问层.md",
+    "zh/content/部署与运维/环境配置.md",
+    "zh/content/核心功能模块/订单管理系统/订单处理.md",
+    "zh/content/核心功能模块/订单管理系统/订单查询与分析.md",
+    "zh/content/部署与运维/数据备份与恢复.md",
+    "zh/content/部署与运维/监控告警.md",
+    "zh/content/部署与运维/部署与运维.md",
+    "zh/content/安全与权限控制/JWT认证机制.md",
+    "zh/content/安全与权限控制/角色权限管理.md",
+    "zh/content/安全与权限控制/安全与权限控制.md",
+    "zh/content/安全与权限控制/安全配置策略.md",
+    "zh/content/推荐系统设计.md",
+    "zh/content/后端架构详解/控制器层设计/商户控制器/商户报表控制器.md",
+    "zh/content/后端架构详解/安全认证与授权/角色权限控制.md",
+    "zh/content/后端架构详解/安全认证与授权/安全认证与授权.md",
+    "zh/content/后端架构详解/安全认证与授权/安全配置管理.md",
+    "zh/content/核心功能模块/内容管理系统.md",
+    "zh/content/核心功能模块/核心功能模块.md",
+    "zh/content/核心功能模块/用户管理系统/用户资料管理.md",
+    "zh/content/核心功能模块/用户管理系统/收货地址管理.md",
+    "zh/content/核心功能模块/用户管理系统/购物车管理.md",
+    "zh/content/核心功能模块/商品管理系统/商品浏览与搜索.md"
+  ]
+}

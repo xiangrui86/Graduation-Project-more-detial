@@ -106,7 +106,8 @@ public class MerchantProductController {
                 .detailImages(detailImages)
                 .brand(request.getBrand())
                 .isNew(request.getIsNew() != null ? request.getIsNew() : false)
-                .onSale(request.getOnSale() != null ? request.getOnSale() : true)
+                .onSale(false)
+                .reviewStatus("PENDING")
                 .merchantId(currentMerchantId(auth))
                 .sales(0)
                 .build();
@@ -161,7 +162,9 @@ public class MerchantProductController {
         product.setImage(request.getImage());
         product.setDetailImages(detailImages);
         product.setIsNew(request.getIsNew() != null ? request.getIsNew() : false);
-        product.setOnSale(request.getOnSale() != null ? request.getOnSale() : true);
+        product.setOnSale(false);
+        product.setReviewStatus("PENDING");
+        product.setReviewReason(null);
         
         return Result.ok(productService.save(product));
     }
