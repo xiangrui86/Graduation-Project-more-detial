@@ -2,10 +2,20 @@
   <div class="page-block admin-products">
     <div class="page-header">
       <div class="header-content">
-        <h2 class="page-title">商品审核</h2>
-        <p class="page-subtitle">审核商家提交的商品，拒绝后退回修改</p>
+        <h2 class="page-title">商品管理</h2>
+        <p class="page-subtitle">管理员可直接上架商品，管理员上架商品无需审核</p>
       </div>
+      <el-button type="primary" class="add-btn" @click="openCreateDialog">
+        新增商品
+      </el-button>
     </div>
+
+    <product-upload-dialog
+      :visible.sync="createDialogVisible"
+      :editing-product="editingProduct"
+      @submit="handleDialogSubmit"
+      @close="handleDialogClose"
+    />
 
     <el-table
       :data="list"
@@ -68,6 +78,22 @@
               详情
             </el-button>
             <el-button
+              type="text"
+              size="small"
+              @click="editProduct(scope.row)"
+              class="edit-btn"
+            >
+              编辑
+            </el-button>
+            <el-button
+              type="text"
+              size="small"
+              @click="confirmDeleteProduct(scope.row.id)"
+              class="delete-btn"
+            >
+              删除
+            </el-button>
+            <el-button
               v-if="scope.row.reviewStatus !== 'APPROVED'"
               type="text"
               size="small"
@@ -107,11 +133,17 @@ import {
   getProducts,
   approveProduct,
   rejectProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 } from "@/api/admin";
+import ProductUploadDialog from "@/components/merchant/ProductUploadDialog.vue";
 
 export default {
   name: "AdminProducts",
-  components: {},
+  components: {
+    ProductUploadDialog,
+  },
   data() {
     return {
       list: [],
@@ -119,6 +151,8 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
+      createDialogVisible: false,
+      editingProduct: null,
     };
   },
   filters: {
@@ -203,7 +237,38 @@ export default {
       return "待审核";
     },
 
-    deleteProduct(id) {
+    openCreateDialog() {
+      this.editingProduct = null;
+      this.createDialogVisible = true;
+    },
+
+    async editProduct(product) {
+      this.editingProduct = product;
+      this.createDialogVisible = true;
+    },
+
+    async handleDialogSubmit(data) {
+      try {
+        if (this.editingProduct && this.editingProduct.id) {
+          await updateProduct(this.editingProduct.id, data);
+          this.$message.success("商品已更新");
+        } else {
+          await createProduct(data);
+          this.$message.success("商品已创建并直接上架");
+        }
+        this.createDialogVisible = false;
+        this.editingProduct = null;
+        this.loadProducts(this.currentPage - 1);
+      } catch (error) {
+        this.$message.error(error.response?.data?.message || "保存失败");
+      }
+    },
+
+    handleDialogClose() {
+      this.editingProduct = null;
+    },
+
+    confirmDeleteProduct(id) {
       this.$confirm("确定删除该商品吗？删除后不可恢复。", "删除确认", {
         confirmButtonText: "确定删除",
         cancelButtonText: "取消",

@@ -35,7 +35,7 @@
           >
             <el-option label="普通用户" value="USER" />
             <el-option label="管理员" value="ADMIN" />
-            <el-option label="运营" value="MERCHANT" />
+            <el-option label="商家" value="MERCHANT" />
           </el-select>
         </el-form-item>
         <el-form-item prop="username">
@@ -73,15 +73,6 @@
             <span class="strength-text">{{ passwordStrengthText }}</span>
           </div>
         </el-form-item>
-        <div class="remember-forgot">
-          <el-checkbox v-model="form.rememberMe">记住我</el-checkbox>
-          <a
-            href="javascript:;"
-            @click="showForgotPassword = true"
-            class="forgot-link"
-            >忘记密码？</a
-          >
-        </div>
         <el-form-item>
           <el-button
             class="login-btn"
@@ -99,7 +90,7 @@
           <span>没有账号？</span>
           <a
             href="javascript:;"
-            @click="showRegister = true"
+            @click.prevent="gotoRegister"
             class="register-link"
             >立即注册</a
           >
@@ -112,7 +103,7 @@
       :visible.sync="showRegister"
       width="520px"
       class="register-dialog"
-      @close="resetRegForm"
+      @close="handleRegisterDialogClose"
     >
       <el-form
         ref="regForm"
@@ -181,14 +172,14 @@
         <el-form-item label="收货人" prop="receiverName">
           <el-input
             v-model="regForm.receiverName"
-            placeholder="默认收货人"
+            placeholder="默认收货人（选填）"
             size="large"
           />
         </el-form-item>
         <el-form-item label="收货电话" prop="receiverPhone">
           <el-input
             v-model="regForm.receiverPhone"
-            placeholder="默认收货电话"
+            placeholder="默认收货电话（选填）"
             size="large"
           />
         </el-form-item>
@@ -199,7 +190,7 @@
             :rows="2"
             maxlength="255"
             show-word-limit
-            placeholder="默认收货地址"
+            placeholder="默认收货地址（选填）"
           />
         </el-form-item>
       </el-form>
@@ -302,7 +293,6 @@ export default {
       form: {
         username: "",
         password: "",
-        rememberMe: false,
       },
       selectedRole: "USER", // 默认选择用户角色
       regForm: {
@@ -431,21 +421,6 @@ export default {
       return "强";
     },
   },
-  mounted() {
-    // 从 localStorage 读取记住的账号信息
-    const remembered = localStorage.getItem("rememberedAccount");
-    if (remembered) {
-      try {
-        const data = JSON.parse(remembered);
-        this.form.username = data.username || "";
-        this.form.password = data.password || "";
-        this.form.rememberMe = true;
-        this.selectedRole = data.role || "USER";
-      } catch (e) {
-        console.error("读取记住的账号失败", e);
-      }
-    }
-  },
   methods: {
     validateField(field) {
       if (this.$refs.loginForm) {
@@ -484,20 +459,6 @@ export default {
         if (res.data.role !== this.selectedRole) {
           this.$message.error(`账号角色不匹配，请选择正确的角色登录`);
           return;
-        }
-
-        // 如果勾选了记住我，保存到 localStorage
-        if (this.form.rememberMe) {
-          localStorage.setItem(
-            "rememberedAccount",
-            JSON.stringify({
-              username: this.form.username,
-              password: this.form.password,
-              role: this.selectedRole,
-            }),
-          );
-        } else {
-          localStorage.removeItem("rememberedAccount");
         }
 
         this.$store.dispatch("login", {
@@ -605,6 +566,29 @@ export default {
       // TODO: 实现忘记密码功能，需要后端支持
       this.$message.info("忘记密码功能开发中，请联系管理员重置密码");
       this.showForgotPassword = false;
+    },
+    gotoRegister() {
+      if (this.$route.name !== "Register") {
+        this.$router.push({ name: "Register" });
+      }
+    },
+    handleRegisterDialogClose() {
+      this.showRegister = false;
+      if (this.$route.name === "Register") {
+        this.$router.push({ name: "Login" });
+      }
+      this.resetRegForm();
+    },
+  },
+  watch: {
+    "$route.name": {
+      handler(newName) {
+        this.showRegister = newName === "Register";
+        if (!this.showRegister) {
+          this.resetRegForm();
+        }
+      },
+      immediate: true,
     },
   },
 };
@@ -839,31 +823,6 @@ export default {
   color: #ff6900;
 }
 
-/* 记住我和忘记密码 */
-.remember-forgot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 13px;
-}
-
-.remember-forgot .el-checkbox {
-  color: #64748b;
-}
-
-.forgot-link {
-  color: #ff6900;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.forgot-link:hover {
-  color: #ff8a3d;
-  text-decoration: underline;
-}
-
 /* 密码强度指示器 */
 .password-strength {
   margin-top: 8px;
@@ -1043,12 +1002,6 @@ export default {
 
   .role-option span {
     font-size: 12px;
-  }
-
-  .remember-forgot {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
   }
 
   .login-btn {

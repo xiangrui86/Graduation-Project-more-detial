@@ -117,8 +117,8 @@ export function addReview(data) {
 }
 
 /** 获取用户聊天会话消息 */
-export function getUserChatList() {
-  return request.get("/user/chat/list");
+export function getUserChatList(params) {
+  return request.get("/user/chat/list", { params });
 }
 /** 发送用户聊天消息 */
 export function sendUserChat(data) {

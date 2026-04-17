@@ -6,7 +6,7 @@
           <span class="mark" />
           <div class="meta">
             <div class="title">Sports Mall</div>
-            <div class="sub">运营中心</div>
+            <div class="sub">商家中心</div>
           </div>
         </div>
         <div class="actions">
@@ -24,6 +24,7 @@
             <el-menu-item index="/merchant/inventory">库存管理</el-menu-item>
             <el-menu-item index="/merchant/reviews">评价管理</el-menu-item>
             <el-menu-item index="/merchant/orders">交易管理</el-menu-item>
+            <el-menu-item index="/merchant/chat">留言回复</el-menu-item>
           </el-menu>
         </aside>
 

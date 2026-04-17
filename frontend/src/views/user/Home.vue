@@ -437,7 +437,7 @@ export default {
   },
   methods: {
     loadData() {
-      // 获取运营配置的首页轮播图
+      // 获取商家配置的首页轮播图
       getBanners()
         .then((res) => {
           if (res.data && res.data.length) {

@@ -219,6 +219,9 @@
             <i class="el-icon-shopping-cart-2"></i> 加入购物车
           </el-button>
           <el-button class="btn-buy" @click="doBuyNow">立即购买</el-button>
+          <el-button type="info" class="btn-service" @click="goToContact">
+            <i class="el-icon-phone-outline"></i> 联系客服
+          </el-button>
         </div>
 
         <!-- 服务保障 -->
@@ -323,7 +326,7 @@
                     class="review-rating"
                   ></el-rate>
                 </div>
-                <div class="review-content">{{ review.content }}</div>
+                <div class="review-content" v-html="review.content"></div>
               </div>
               <!-- 加载更多按钮 -->
               <div class="review-footer" v-if="totalReviews > reviews.length">
@@ -342,6 +345,54 @@
     </div>
 
     <!-- 详情图选择对话框 -->
+    <el-dialog
+      title="联系客服"
+      :visible.sync="showContactDialog"
+      width="520px"
+      :close-on-click-modal="false"
+      :append-to-body="true"
+    >
+      <div class="chat-panel">
+        <div class="chat-msgs">
+          <div v-if="chatLoading" class="chat-loading">
+            <el-skeleton :rows="3" animated />
+          </div>
+          <div v-else-if="chatMessages.length === 0" class="chat-empty">
+            <i class="el-icon-chat-line-round"></i>
+            <p>暂无客服记录，提交问题后客服会尽快回复。</p>
+          </div>
+          <div v-else class="chat-list">
+            <div
+              v-for="msg in chatMessages"
+              :key="msg.id"
+              :class="[
+                'chat-item',
+                msg.senderRole === 'USER'
+                  ? 'chat-item-user'
+                  : 'chat-item-merchant',
+              ]"
+            >
+              <div class="chat-label">
+                {{ msg.senderRole === "USER" ? "我" : "商家回复" }}
+              </div>
+              <div class="chat-body">{{ msg.content }}</div>
+              <div class="chat-time">{{ formatDate(msg.createdAt) }}</div>
+            </div>
+          </div>
+        </div>
+        <el-input
+          type="textarea"
+          :rows="4"
+          v-model="contactMessage"
+          placeholder="请输入您想咨询的问题"
+        />
+        <div class="dialog-footer">
+          <el-button @click="showContactDialog = false">取消</el-button>
+          <el-button type="primary" @click="sendContactMessage">发送</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
     <el-dialog
       title="选择商品款式"
       :visible.sync="showDetailImageDialog"
@@ -382,7 +433,12 @@
 
 <script>
 import { getProduct } from "@/api/pub";
-import { addCart, addFavorite } from "@/api/user";
+import {
+  addCart,
+  addFavorite,
+  getUserChatList,
+  sendUserChat,
+} from "@/api/user";
 import { getReviews } from "@/api/pub";
 
 export default {
@@ -405,6 +461,10 @@ export default {
       reviewPage: 0,
       reviewPageSize: 10,
       totalReviews: 0,
+      showContactDialog: false,
+      contactMessage: "",
+      chatMessages: [],
+      chatLoading: false,
     };
   },
 
@@ -426,6 +486,8 @@ export default {
           }
           // 加载评价
           this.loadReviews();
+          // 加载商品客服聊天记录
+          this.loadProductChat();
         }
       });
     },
@@ -448,6 +510,49 @@ export default {
         })
         .catch(() => {
           this.reviewsLoading = false;
+        });
+    },
+    loadProductChat() {
+      if (!this.$store.state.user || !this.product || !this.product.id) return;
+      this.chatLoading = true;
+      getUserChatList({ productId: this.product.id })
+        .then((res) => {
+          if (res.data) {
+            this.chatMessages = res.data;
+          }
+        })
+        .finally(() => {
+          this.chatLoading = false;
+        });
+    },
+    goToContact() {
+      if (!this.$store.state.user) {
+        this.$router.push("/login");
+        return;
+      }
+      if (!this.product || !this.product.id) return;
+      this.$router.push({ path: "/chat", query: { productId: this.product.id } });
+    },
+    sendContactMessage() {
+      if (!this.contactMessage.trim()) {
+        this.$message.warning("请输入消息内容");
+        return;
+      }
+      sendUserChat({
+        productId: this.product.id,
+        content: this.contactMessage.trim(),
+      })
+        .then((res) => {
+          if (res.code === 200) {
+            this.chatMessages.push(res.data);
+            this.contactMessage = "";
+            this.$message.success("消息已发送，客服会尽快回复");
+          } else {
+            this.$message.error(res.message || "发送失败");
+          }
+        })
+        .catch(() => {
+          this.$message.error("发送失败");
         });
     },
     loadMoreReviews() {
@@ -1036,6 +1141,82 @@ export default {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(255, 105, 0, 0.45);
 }
+.btn-service {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1.5px solid #bfdbfe;
+  height: 52px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-service:hover {
+  background: #dbeafe;
+}
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.chat-msgs {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+.chat-empty {
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 0;
+}
+.chat-item {
+  margin-bottom: 14px;
+  max-width: 80%;
+  border-radius: 14px;
+  padding: 12px 14px;
+  line-height: 1.6;
+  position: relative;
+}
+.chat-item-user {
+  background: #2563eb;
+  color: #fff;
+  margin-left: auto;
+}
+.chat-item-merchant {
+  background: #fff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+.chat-label {
+  font-size: 12px;
+  color: inherit;
+  margin-bottom: 4px;
+  opacity: 0.85;
+}
+.chat-body {
+  white-space: pre-wrap;
+}
+.chat-time {
+  font-size: 12px;
+  color: rgba(15, 23, 42, 0.55);
+  margin-top: 8px;
+}
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 
 /* 服务保障 */
 .guarantee-strip {
@@ -1384,6 +1565,17 @@ export default {
   color: #475569;
   line-height: 1.6;
   word-break: break-word;
+}
+
+.review-content p {
+  margin: 0 0 10px;
+}
+
+.review-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 8px 0;
 }
 
 .review-footer {

@@ -173,11 +173,16 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="100" align="center" fixed="right">
+        <el-table-column label="状态" width="140" align="center" fixed="right">
           <template #default="scope">
-            <el-tag :type="getStatusType(scope.row.status)">
-              {{ statusText(scope.row.status) }}
-            </el-tag>
+            <div class="status-cell">
+              <el-tag :type="getStatusType(scope.row.status)">
+                {{ statusText(scope.row.status) }}
+              </el-tag>
+              <div v-if="scope.row.status === 'PENDING'" class="status-subtext">
+                剩余支付：{{ remainingCancelTimeText(scope.row) }}
+              </div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="支付" width="80" align="center" fixed="right">
@@ -231,6 +236,19 @@
             <span v-else class="action-disabled">—</span>
           </template>
         </el-table-column>
+        <el-table-column label="退款" width="80" align="center" fixed="right">
+          <template #default="scope">
+            <el-button
+              v-if="scope.row.status === 'RECEIVED'"
+              type="warning"
+              size="small"
+              @click="openRefund(scope.row)"
+            >
+              退款
+            </el-button>
+            <span v-else class="action-disabled">—</span>
+          </template>
+        </el-table-column>
         <el-table-column label="详情" width="80" align="center" fixed="right">
           <template #default="scope">
             <el-button size="small" plain @click="viewDetail(scope.row.id)">
@@ -272,10 +290,31 @@
             <span class="dm-label">订单号</span>
             <span class="dm-value mono">{{ detail.order.orderNo }}</span>
           </div>
+          <div
+            class="detail-meta-item"
+            v-if="detail.order.status === 'RECEIVED'"
+          >
+            <el-button
+              type="warning"
+              size="small"
+              @click="openRefund(detail.order)"
+            >
+              申请退款
+            </el-button>
+          </div>
           <div class="detail-meta-item">
             <span class="dm-label">状态</span>
             <span :class="['status-chip', `status-${detail.order.status}`]">
               {{ statusText(detail.order.status) }}
+            </span>
+          </div>
+          <div
+            class="detail-meta-item"
+            v-if="detail.order.status === 'PENDING'"
+          >
+            <span class="dm-label">剩余支付</span>
+            <span class="dm-value amount-highlight">
+              {{ remainingCancelTimeText(detail.order) }}
             </span>
           </div>
           <div class="detail-meta-item">
@@ -433,10 +472,14 @@
       width="680px"
       append-to-body
       class="refund-dialog"
+      @close="refundRejectReason = null"
     >
       <div class="refund-tip">
         <i class="el-icon-info-outline"></i>
         请选择需要退款的商品及数量，提交后将进入审核流程，审核通过后退款原路返回
+      </div>
+      <div v-if="refundRejectReason" class="refund-reject-note">
+        商家已拒绝上次退款申请：{{ refundRejectReason }}
       </div>
       <el-form :model="refundForm" label-width="80px">
         <el-form-item label="退款商品" v-if="refundItems.length">
@@ -556,7 +599,6 @@ import {
   payOrder,
   cancelOrder,
   confirmReceive,
-  completeOrder,
   batchRefundItems,
   addReview,
 } from "@/api/user";
@@ -575,6 +617,7 @@ export default {
       refundVisible: false,
       refundLoading: false,
       refundForm: { orderId: null, reason: "" },
+      refundRejectReason: null,
       refundItems: [],
       refundSelectedItemIds: [],
       refundItemQuantities: {},
@@ -592,6 +635,8 @@ export default {
       reviewedItemIds: [],
       reviewEditor: null,
       keyword: "",
+      currentTime: Date.now(),
+      countdownTimer: null,
       statusOptions: [
         { label: "全部", value: "ALL" },
         { label: "待付款", value: "PENDING" },
@@ -723,6 +768,25 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+    },
+    startCancelTimer() {
+      if (this.countdownTimer) return;
+      this.countdownTimer = setInterval(() => {
+        this.currentTime = Date.now();
+      }, 1000);
+    },
+    remainingCancelSeconds(order) {
+      if (!order || order.status !== "PENDING" || !order.createdAt) return 0;
+      const createdAt = new Date(order.createdAt).getTime();
+      const expireAt = createdAt + 30 * 60 * 1000;
+      return Math.max(0, Math.floor((expireAt - this.currentTime) / 1000));
+    },
+    remainingCancelTimeText(order) {
+      const seconds = this.remainingCancelSeconds(order);
+      if (seconds <= 0) return "已超时，正在取消";
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}分${String(secs).padStart(2, "0")}秒`;
     },
     pay(id) {
       payOrder(id).then((res) => {
@@ -873,38 +937,60 @@ export default {
           this.$message.success("评价成功，感谢您的反馈");
           this.reviewDialogVisible = false;
           this.reviewedItemIds.push(this.reviewTarget.id);
+          const item = this.detail?.items?.find(
+            (i) => i.id === this.reviewTarget.id,
+          );
+          if (item) {
+            item.reviewed = true;
+          }
           this.reviewTarget = null;
-          // 评价提交成功后，状态变为已完成
-          completeOrder(this.detail.order.id).then(() => {
-            this.load();
-          });
+          this.load();
         } else {
           this.$message.error(res.message || "评价提交失败");
         }
       });
     },
     openRefund(row) {
-      getOrderDetail(row.id).then((res) => {
-        const data = res.data;
-        if (!data || !data.items) {
-          console.error("订单详情加载失败");
-          return;
-        }
-        const candidates = data.items.filter((it) => !it.refundStatus);
-        if (!candidates.length) {
-          console.warn("该订单暂无可退款商品");
-          return;
-        }
-        this.refundItems = candidates;
-        this.refundSelectedItemIds =
-          candidates.length === 1 ? [candidates[0].id] : [];
-        this.refundItemQuantities = candidates.reduce((acc, it) => {
-          acc[it.id] = it.quantity;
-          return acc;
-        }, {});
-        this.refundForm = { orderId: row.id, reason: "" };
-        this.refundVisible = true;
-      });
+      getOrderDetail(row.id)
+        .then((res) => {
+          const data = res.data;
+          if (!data || !data.items) {
+            this.refundRejectReason = null;
+            this.$message.error("订单详情加载失败，请稍后重试");
+            return;
+          }
+          const rejectReason =
+            data.order &&
+            data.order.refundRejectTime &&
+            data.order.status === "RECEIVED"
+              ? data.order.refundRejectReason || "商家已拒绝上次退款申请"
+              : null;
+          this.refundRejectReason = rejectReason;
+          if (rejectReason) {
+            this.$message.warning(rejectReason);
+          }
+          const candidates = data.items.filter((it) => !it.refundStatus);
+          if (!candidates.length) {
+            this.$message.warning(
+              "该订单暂无可退款商品，可能已提交退款申请或已退款",
+            );
+            return;
+          }
+          this.refundItems = candidates;
+          this.refundSelectedItemIds =
+            candidates.length === 1 ? [candidates[0].id] : [];
+          this.refundItemQuantities = candidates.reduce((acc, it) => {
+            acc[it.id] = it.quantity;
+            return acc;
+          }, {});
+          this.refundForm = { orderId: row.id, reason: "" };
+          this.refundVisible = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.refundRejectReason = null;
+          this.$message.error("订单详情加载失败，请检查网络或重试");
+        });
     },
     toggleAllRefundItems(checked) {
       this.refundSelectedItemIds = checked
@@ -937,17 +1023,22 @@ export default {
         })
           .then((res) => {
             if (res.code === 200) {
-              console.log(
+              this.$message.success(
                 `已提交${this.refundSelectedItemIds.length} 件商品退款申请`,
               );
               this.refundVisible = false;
               this.refundItems = [];
               this.refundSelectedItemIds = [];
               this.refundItemQuantities = {};
+              this.refundRejectReason = null;
               this.load();
             } else {
-              console.error(res.message || "提交失败");
+              this.$message.error(res.message || "退款申请提交失败");
             }
+          })
+          .catch((err) => {
+            console.error(err);
+            this.$message.error("退款申请失败，请稍后重试");
           })
           .finally(() => {
             this.refundLoading = false;
@@ -957,6 +1048,13 @@ export default {
   },
   mounted() {
     this.load();
+    this.startCancelTimer();
+  },
+  beforeDestroy() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
   },
 };
 </script>
@@ -1270,6 +1368,16 @@ export default {
 .status-PENDING {
   background: #fdf6ec;
   color: #e6a23c;
+}
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.status-subtext {
+  font-size: 12px;
+  color: #909399;
 }
 .status-PAID {
   background: #ecf5ff;

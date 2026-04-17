@@ -45,11 +45,18 @@ public class AdminUserController {
         if (userRepository.existsByUsername(username)) {
             return ResponseEntity.ok(Result.fail("用户名已存在"));
         }
+        if (roleStr == null || roleStr.isBlank()) {
+            return ResponseEntity.ok(Result.fail("请选择用户角色"));
+        }
         Role role = Role.valueOf(roleStr);
+        if (role == Role.ADMIN) {
+            return ResponseEntity.ok(Result.fail("不能新增管理员账号"));
+        }
         User u = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .nickname((String) body.get("nickname"))
+                .phone((String) body.get("phone"))
                 .role(role)
                 .merchantId(merchantId)
                 .enabled(true)
@@ -65,6 +72,7 @@ public class AdminUserController {
         if (opt.isEmpty()) return ResponseEntity.ok(Result.fail("用户不存在"));
         User u = opt.get();
         if (body.containsKey("nickname")) u.setNickname((String) body.get("nickname"));
+        if (body.containsKey("phone")) u.setPhone((String) body.get("phone"));
         if (body.containsKey("enabled")) u.setEnabled((Boolean) body.get("enabled"));
         if (body.containsKey("merchantId")) u.setMerchantId(body.get("merchantId") != null ? Long.valueOf(body.get("merchantId").toString()) : null);
         userRepository.save(u);
@@ -74,6 +82,13 @@ public class AdminUserController {
     /** 删除用户。 */
     @DeleteMapping("/{id}")
     public ResponseEntity<Result<?>> delete(@PathVariable Long id) {
+        Optional<User> opt = userRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.ok(Result.fail("用户不存在"));
+        }
+        if (opt.get().getRole() == Role.ADMIN) {
+            return ResponseEntity.ok(Result.fail("管理员账号不能删除"));
+        }
         userRepository.deleteById(id);
         return ResponseEntity.ok(Result.ok(null));
     }

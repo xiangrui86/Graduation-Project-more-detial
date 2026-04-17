@@ -18,22 +18,22 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/merchant/product")
 @RequiredArgsConstructor
-/** 运营商品接口：商品列表、详情、新增、更新、删除。 */
+/** 商家商品接口：商品列表、详情、新增、更新、删除。 */
 public class MerchantProductController {
 
     private final ProductService productService;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    /** 获取当前运营 ID（由登录用户映射）。 */
+    /** 获取当前商家 ID（由登录用户映射）。 */
     private Long currentMerchantId(Authentication auth) {
         Long userId = (Long) auth.getPrincipal();
         User u = userRepository.findById(userId).orElseThrow();
-        if (u.getMerchantId() == null) throw new RuntimeException("非运营账号");
+        if (u.getMerchantId() == null) throw new RuntimeException("非商家账号");
         return u.getMerchantId();
     }
 
-    /** 分页查询当前运营的商品。 */
+    /** 分页查询当前商家的商品。 */
     @GetMapping
     public Result<?> list(
             Authentication auth,

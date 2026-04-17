@@ -19,7 +19,12 @@
         clearable
         @clear="clearSearch"
       />
-      <el-button type="primary" class="search-btn" @click="doSearch" :loading="loading">
+      <el-button
+        type="primary"
+        class="search-btn"
+        @click="doSearch"
+        :loading="loading"
+      >
         <i class="el-icon-search"></i> 搜索
       </el-button>
     </div>
@@ -29,22 +34,47 @@
       <div class="filter-category" v-if="!isSearchResult">
         <span
           class="fcat-item"
-          :class="{ active: categoryId === null }"
-          @click="selectCategory(null)"
-        >全部</span>
+          :class="{ active: selectedParentId === null }"
+          @click="selectAllCategories"
+          >全部</span
+        >
         <span
-          v-for="c in categories"
+          v-for="c in parentCategories"
           :key="c.id"
           class="fcat-item"
-          :class="{ active: categoryId === c.id }"
-          @click="selectCategory(c.id)"
-        >{{ c.name }}</span>
+          :class="{ active: selectedParentId === c.id }"
+          @click="selectParentCategory(c.id)"
+          >{{ c.name }}</span
+        >
+      </div>
+      <div
+        class="filter-category"
+        v-if="
+          !isSearchResult && selectedParentId != null && childCategories.length
+        "
+      >
+        <span
+          class="fcat-item"
+          :class="{ active: !selectedChildId }"
+          @click="selectParentCategory(selectedParentId)"
+          >全部{{ parentName }}</span
+        >
+        <span
+          v-for="c in childCategories"
+          :key="c.id"
+          class="fcat-item"
+          :class="{ active: selectedChildId === c.id }"
+          @click="selectChildCategory(c.id)"
+          >{{ c.name }}</span
+        >
       </div>
       <!-- 搜索结果条 -->
       <div v-if="isSearchResult" class="search-result-tip">
         <i class="el-icon-s-order"></i>
-        共找到 <span class="count">{{ total }}</span> 个与
-        "<span class="keyword">{{ currentKeyword }}</span>"相关商品
+        共找到 <span class="count">{{ total }}</span> 个与 "<span
+          class="keyword"
+          >{{ currentKeyword }}</span
+        >"相关商品
         <span class="clear-btn" @click="clearSearch">
           <i class="el-icon-close"></i> 清除
         </span>
@@ -57,14 +87,21 @@
             class="sort-tab"
             :class="{ active: sortType === 'default' }"
             @click="handleSortChange('default')"
-          >综合</span>
+            >综合</span
+          >
           <span
             class="sort-tab"
             :class="{ active: sortType === 'price-asc' }"
             @click="handleSortChange('price-asc')"
           >
             价格
-            <i :class="sortType === 'price-asc' ? 'el-icon-top active-icon' : 'el-icon-sort'"></i>
+            <i
+              :class="
+                sortType === 'price-asc'
+                  ? 'el-icon-top active-icon'
+                  : 'el-icon-sort'
+              "
+            ></i>
           </span>
           <span
             class="sort-tab"
@@ -72,13 +109,20 @@
             @click="handleSortChange('price-desc')"
           >
             价格
-            <i :class="sortType === 'price-desc' ? 'el-icon-bottom active-icon' : 'el-icon-sort'"></i>
+            <i
+              :class="
+                sortType === 'price-desc'
+                  ? 'el-icon-bottom active-icon'
+                  : 'el-icon-sort'
+              "
+            ></i>
           </span>
           <span
             class="sort-tab"
             :class="{ active: sortType === 'sales' }"
             @click="handleSortChange('sales')"
-          >销量</span>
+            >销量</span
+          >
         </div>
         <span class="total-count" v-if="total > 0">共 {{ total }} 件</span>
       </div>
@@ -99,7 +143,8 @@
         <i class="el-icon-search"></i>
       </div>
       <div class="empty-text" v-if="isSearchResult">
-        未找到与 "<span>{{ currentKeyword }}</span>" 相关的商品
+        未找到与 "<span>{{ currentKeyword }}</span
+        >" 相关的商品
       </div>
       <div class="empty-text" v-else>暂无商品</div>
       <div class="empty-suggest" v-if="isSearchResult">
@@ -137,8 +182,10 @@ export default {
       list: [],
       categories: [],
       categoryId: null,
+      selectedParentId: null,
+      selectedChildId: null,
       searchQuery: "",
-      currentKeyword: "",   // 已提交的搜索词（与 searchQuery 分离）
+      currentKeyword: "", // 已提交的搜索词（与 searchQuery 分离）
       isSearchResult: false,
       loading: false,
       sortType: "default",
@@ -173,6 +220,25 @@ export default {
       this.load();
     },
   },
+  computed: {
+    parentCategories() {
+      return (this.categories || []).filter((c) => c.parentId == null);
+    },
+    childCategories() {
+      if (this.selectedParentId == null) return [];
+      return (this.categories || []).filter(
+        (c) =>
+          c.parentId != null &&
+          Number(c.parentId) === Number(this.selectedParentId),
+      );
+    },
+    parentName() {
+      const parent = this.parentCategories.find(
+        (c) => Number(c.id) === Number(this.selectedParentId),
+      );
+      return parent ? parent.name : "";
+    },
+  },
   methods: {
     loadCategories() {
       getAllCategories()
@@ -183,15 +249,43 @@ export default {
         })
         .catch(() => {});
     },
+    selectAllCategories() {
+      this.selectedParentId = null;
+      this.selectedChildId = null;
+      this.categoryId = null;
+      this.page = 0;
+      this.load();
+    },
+    selectParentCategory(id) {
+      this.selectedParentId = id;
+      this.selectedChildId = null;
+      this.categoryId = id;
+      this.page = 0;
+      this.load();
+    },
+    selectChildCategory(id) {
+      this.selectedChildId = id;
+      this.categoryId = id;
+      this.page = 0;
+      this.load();
+    },
     load() {
       this.loading = true;
       const params = { page: this.page, size: this.pageSize };
       if (this.categoryId != null) params.categoryId = this.categoryId;
-      if (this.currentKeyword.trim()) params.search = this.currentKeyword.trim();
+      if (this.currentKeyword.trim())
+        params.search = this.currentKeyword.trim();
       // 排序参数
-      if (this.sortType === "price-asc") { params.sort = "price"; params.direction = "asc"; }
-      else if (this.sortType === "price-desc") { params.sort = "price"; params.direction = "desc"; }
-      else if (this.sortType === "sales") { params.sort = "sales"; params.direction = "desc"; }
+      if (this.sortType === "price-asc") {
+        params.sort = "price";
+        params.direction = "asc";
+      } else if (this.sortType === "price-desc") {
+        params.sort = "price";
+        params.direction = "desc";
+      } else if (this.sortType === "sales") {
+        params.sort = "sales";
+        params.direction = "desc";
+      }
 
       getProducts(params)
         .then((res) => {
@@ -212,8 +306,13 @@ export default {
             this.total = 0;
           }
         })
-        .catch(() => { this.list = []; this.total = 0; })
-        .finally(() => { this.loading = false; });
+        .catch(() => {
+          this.list = [];
+          this.total = 0;
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     selectCategory(id) {
       this.categoryId = id;
@@ -227,13 +326,17 @@ export default {
       this.isSearchResult = true;
       this.page = 0;
       this.categoryId = null;
+      this.selectedParentId = null;
+      this.selectedChildId = null;
       // 同步 URL query 参数
       // 通过路由变化驱动加载，避免重复请求
       if (this.$route.query.search === q) {
         // 关键词未变，直接加载
         this.load();
       } else {
-        this.$router.replace({ path: "/products", query: { search: q } }).catch(() => {});
+        this.$router
+          .replace({ path: "/products", query: { search: q } })
+          .catch(() => {});
       }
     },
     clearSearch() {
@@ -378,7 +481,7 @@ export default {
   margin-bottom: 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   border: 1px solid #f0f0f0;
   flex-wrap: wrap;
@@ -454,13 +557,13 @@ export default {
 }
 .sort-tab:hover {
   color: #ff6900;
-  background: rgba(255,105,0,0.06);
+  background: rgba(255, 105, 0, 0.06);
 }
 .sort-tab.active {
   background: white;
   color: #ff6900;
   font-weight: 600;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 .active-icon {
   color: #ff6900;
@@ -544,17 +647,13 @@ export default {
 }
 
 .empty-suggest li::before {
-  content: '· ';
+  content: "· ";
   color: #ff6900;
 }
-
-
 
 .pagination-center {
   display: flex;
   justify-content: center;
   margin-top: 30px;
 }
-
-
 </style>

@@ -20,21 +20,21 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/merchant/order")
 @RequiredArgsConstructor
-/** 运营端订单接口：订单查询、发货与退款处理。 */
+/** 商家端订单接口：订单查询、发货与退款处理。 */
 public class MerchantOrderController {
 
     private final OrderService orderService;
     private final UserRepository userRepository;
 
-    /** 从当前登录账号解析所属运营 ID。 */
+    /** 从当前登录账号解析所属商家 ID。 */
     private Long currentMerchantId(Authentication auth) {
         Long userId = (Long) auth.getPrincipal();
         User u = userRepository.findById(userId).orElseThrow();
-        if (u.getMerchantId() == null) throw new RuntimeException("非运营账号");
+        if (u.getMerchantId() == null) throw new RuntimeException("非商家账号");
         return u.getMerchantId();
     }
 
-    /** 分页查询当前运营的订单列表。 */
+    /** 分页查询当前商家的订单列表。 */
     @GetMapping
     public ResponseEntity<Result<?>> list(
             Authentication auth,
@@ -58,7 +58,7 @@ public class MerchantOrderController {
         return ResponseEntity.ok(Result.ok(data));
     }
 
-    /** 运营发货：仅允许已支付订单。 */
+    /** 商家发货：仅允许已支付订单。 */
     @PostMapping("/{id}/ship")
     public ResponseEntity<Result<?>> ship(Authentication auth, @PathVariable Long id) {
         Optional<Order> o = orderService.getById(id);
@@ -82,6 +82,17 @@ public class MerchantOrderController {
         }
         orderService.updateStatus(id, "REFUNDED");
         return ResponseEntity.ok(Result.ok(null));
+    }
+
+    /** 拒绝退款：将订单退回已收货状态。 */
+    @PostMapping("/{id}/reject-refund")
+    public ResponseEntity<Result<?>> rejectRefund(Authentication auth, @PathVariable Long id) {
+        try {
+            orderService.rejectRefund(id, currentMerchantId(auth));
+            return ResponseEntity.ok(Result.ok(null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Result.fail(e.getMessage()));
+        }
     }
 
     /** 同意单个订单项退款 */

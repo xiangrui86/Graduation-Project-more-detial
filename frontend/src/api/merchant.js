@@ -1,16 +1,16 @@
 import request from "./request";
 
 /**
- * 运营端接口集合
+ * 商家端接口集合
  * 覆盖店铺看板、商品管理、订单履约和图片上传能力。
  */
 
-/** 获取运营看板数据 */
+/** 获取商家看板数据 */
 export function getReport() {
   return request.get("/merchant/report/dashboard");
 }
 
-/** 查询运营商品列表 */
+/** 查询商家商品列表 */
 export function getProducts(params) {
   return request.get("/merchant/product", { params });
 }
@@ -119,9 +119,24 @@ export function acceptRefund(id) {
   return request.post(`/merchant/order/${id}/accept-refund`);
 }
 
+/** 拒绝退款 */
+export function rejectRefund(id) {
+  return request.post(`/merchant/order/${id}/reject-refund`);
+}
+
 /** 获取可选图片列表 */
 export function listImages() {
   return request.get("/pub/images/list");
+}
+
+/** 获取商品客服聊天记录 */
+export function getProductChat(productId) {
+  return request.get("/merchant/chat/list", { params: { productId } });
+}
+
+/** 商家发送商品客服消息 */
+export function sendProductChat(productId, userId, content) {
+  return request.post("/merchant/chat/send", { productId, userId, content });
 }
 
 /** 上传商品图片 */

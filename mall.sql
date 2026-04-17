@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 28/03/2026 14:17:05
+ Date: 15/04/2026 10:44:42
 */
 
 SET NAMES utf8mb4;
@@ -37,7 +37,7 @@ CREATE TABLE `address`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FKrbi6ij3u9oy8qrwyb2r0q3v09`(`user_id` ASC) USING BTREE,
   CONSTRAINT `FKrbi6ij3u9oy8qrwyb2r0q3v09` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of address
@@ -61,7 +61,7 @@ CREATE TABLE `banner`  (
   `product_id` bigint NOT NULL,
   `sort_order` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of banner
@@ -82,7 +82,7 @@ CREATE TABLE `cart_item`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `UK2dhdhp9i9ld88nv1bejg9hbx7`(`user_id` ASC, `product_id` ASC) USING BTREE,
   UNIQUE INDEX `UKqulwp04wxfroadnvfvoex2p1g`(`user_id` ASC, `product_id` ASC, `spec_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of cart_item
@@ -111,27 +111,6 @@ INSERT INTO `category` VALUES (6, '2026-03-13 15:01:29.203325', 6, NULL, '自行
 INSERT INTO `category` VALUES (8, '2026-03-13 15:48:14.962726', 8, NULL, '头盔', NULL);
 INSERT INTO `category` VALUES (0, '2026-03-27 15:58:37.788469', 12, NULL, '户外露营', NULL);
 INSERT INTO `category` VALUES (0, '2026-03-27 16:02:57.295645', 13, NULL, '水上 / 冰雪', NULL);
-
--- ----------------------------
--- Table structure for chat_message
--- ----------------------------
-DROP TABLE IF EXISTS `chat_message`;
-CREATE TABLE `chat_message`  (
-  `read_flag` bit(1) NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `receiver_id` bigint NOT NULL,
-  `sender_id` bigint NOT NULL,
-  `receiver_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sender_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of chat_message
--- ----------------------------
-INSERT INTO `chat_message` VALUES (b'0', '2026-03-12 17:06:43.070359', 1, 2, 3, 'MERCHANT', 'USER', '111');
 
 -- ----------------------------
 -- Table structure for favorite
@@ -173,7 +152,7 @@ CREATE TABLE `merchant`  (
 -- ----------------------------
 -- Records of merchant
 -- ----------------------------
-INSERT INTO `merchant` VALUES (b'1', '2026-03-08 16:23:40.402009', 1, '2026-03-26 17:44:02.243858', NULL, NULL, '运营1号', NULL, '专业运动器材和装备销售');
+INSERT INTO `merchant` VALUES (b'1', '2026-03-08 16:23:40.402009', 1, '2026-03-26 17:44:02.243858', NULL, NULL, '商家1号', NULL, '专业运动器材和装备销售');
 
 -- ----------------------------
 -- Table structure for news
@@ -217,7 +196,7 @@ CREATE TABLE `order_item`  (
   `spec_value` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `reviewed` bit(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of order_item
@@ -233,7 +212,7 @@ INSERT INTO `order_item` VALUES (199.00, 1, 199.00, '2026-03-19 14:19:50.755594'
 INSERT INTO `order_item` VALUES (1899.00, 2, 3798.00, '2026-03-19 14:19:50.761957', 9, 5, 3, '跑步机', '/api/images/treadmill.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
 INSERT INTO `order_item` VALUES (399.00, 2, 798.00, '2026-03-19 14:19:50.765050', 10, 5, 4, '羽毛球拍', '/api/images/badminton.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
 INSERT INTO `order_item` VALUES (99.00, 1, 99.00, '2026-03-19 14:19:50.767569', 11, 5, 11, '哑铃', '/api/images/Dumbbell.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
-INSERT INTO `order_item` VALUES (199.00, 2, 398.00, '2026-03-24 22:20:30.404409', 12, 6, 2, '篮球', '/api/images/basketball.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (199.00, 2, 398.00, '2026-03-24 22:20:30.404409', 12, 6, 2, '篮球', '/api/images/basketball.jpg', NULL, NULL, NULL, NULL, NULL, b'1');
 INSERT INTO `order_item` VALUES (1899.00, 2, 3798.00, '2026-03-24 22:20:30.407279', 13, 6, 3, '跑步机', '/api/images/treadmill.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
 INSERT INTO `order_item` VALUES (399.00, 1, 399.00, '2026-03-24 22:20:30.409285', 14, 6, 4, '羽毛球拍', '/api/images/badminton.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
 INSERT INTO `order_item` VALUES (200.00, 1, 200.00, '2026-03-24 22:20:30.411777', 15, 6, 10, '骑行头盔', '/api/images/Bicycle helmet.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
@@ -246,8 +225,15 @@ INSERT INTO `order_item` VALUES (199.00, 1, 199.00, '2026-03-26 14:16:03.617603'
 INSERT INTO `order_item` VALUES (59.90, 1, 59.90, '2026-03-26 18:04:07.891043', 22, 10, 1, '迪卡侬儿童足球', 'http://localhost:8080/api/pub/images/view/1774511322168_1774442212560_football__2_.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
 INSERT INTO `order_item` VALUES (59.90, 1, 59.90, '2026-03-26 19:10:17.422892', 23, 11, 1, '迪卡侬儿童足球', 'http://localhost:8080/api/pub/images/view/1774511322168_1774442212560_football__2_.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
 INSERT INTO `order_item` VALUES (2199.00, 1, 2199.00, '2026-03-26 19:10:17.429003', 24, 11, 8, '福特山地自行车', 'http://localhost:8080/api/pub/images/view/1774517819328_8a48660db5767d675acc1aa609406d2.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
-INSERT INTO `order_item` VALUES (1899.00, 1, 1899.00, '2026-03-27 15:31:58.133882', 25, 12, 3, '立久佳猛犸跑步机', 'http://localhost:8080/api/pub/images/view/1774516799208_df50af8402564e7446921eb829a8e58.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (1899.00, 1, 1899.00, '2026-03-27 15:31:58.133882', 25, 12, 3, '立久佳猛犸跑步机', 'http://localhost:8080/api/pub/images/view/1774516799208_df50af8402564e7446921eb829a8e58.jpg', NULL, NULL, NULL, NULL, NULL, b'1');
 INSERT INTO `order_item` VALUES (99.00, 1, 99.00, '2026-03-27 15:31:58.135891', 26, 12, 4, '李宁羽毛球套装', 'http://localhost:8080/api/pub/images/view/1774517190662_019b2a577e16f58b09be74b5257a3b2.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (59.90, 1, 59.90, '2026-03-31 19:10:42.181708', 27, 13, 1, '迪卡侬儿童足球', 'http://localhost:8080/api/pub/images/view/1774511322168_1774442212560_football__2_.jpg', NULL, NULL, NULL, NULL, NULL, b'1');
+INSERT INTO `order_item` VALUES (1899.00, 1, 1899.00, '2026-03-31 19:10:42.193837', 28, 13, 3, '立久佳猛犸跑步机', 'http://localhost:8080/api/pub/images/view/1774516799208_df50af8402564e7446921eb829a8e58.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (99.00, 1, 99.00, '2026-03-31 19:10:42.197243', 29, 13, 4, '李宁羽毛球套装', 'http://localhost:8080/api/pub/images/view/1774517190662_019b2a577e16f58b09be74b5257a3b2.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (6999.00, 1, 6999.00, '2026-03-31 19:10:42.198245', 30, 13, 14, 'ATOMIC阿托米克滑雪双板2526新品', 'http://localhost:8080/api/pub/images/view/1774600155582_f2e77b97878dc4c78b4254824dc125a.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (2199.00, 1, 2199.00, '2026-03-31 19:49:53.611416', 31, 14, 8, '福特山地自行车', 'http://localhost:8080/api/pub/images/view/1774517819328_8a48660db5767d675acc1aa609406d2.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (6999.00, 1, 6999.00, '2026-03-31 19:49:53.612429', 32, 14, 14, 'ATOMIC阿托米克滑雪双板2526新品', 'http://localhost:8080/api/pub/images/view/1774600155582_f2e77b97878dc4c78b4254824dc125a.jpg', NULL, NULL, NULL, NULL, NULL, b'0');
+INSERT INTO `order_item` VALUES (99.00, 1, 99.00, '2026-03-31 19:50:06.392256', 33, 15, 4, '李宁羽毛球套装', 'http://localhost:8080/api/pub/images/view/1774517190662_019b2a577e16f58b09be74b5257a3b2.jpg', '不想要了', '2026-03-31 19:55:52.142269', 'REFUND_REQUESTED', NULL, NULL, b'1');
 
 -- ----------------------------
 -- Table structure for orders
@@ -272,7 +258,7 @@ CREATE TABLE `orders`  (
   `refund_request_time` datetime(6) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `UKg8pohnngqi5x1nask7nff2u7w`(`order_no` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of orders
@@ -282,13 +268,16 @@ INSERT INTO `orders` VALUES (1196.00, 1196.00, '2026-03-09 13:55:15.464522', 2, 
 INSERT INTO `orders` VALUES (2093.00, 2093.00, '2026-03-11 23:49:34.153428', 3, 1, '2026-03-11 23:49:35.650374', '2026-03-24 22:09:29.858550', 3, '11', 'REFUNDED', 'O202603112349348b0d6b6e', 'SIMULATE', '11', '11', '不想要了', '2026-03-24 22:08:41.981713');
 INSERT INTO `orders` VALUES (8195.00, 8195.00, '2026-03-13 15:06:49.441514', 4, 1, '2026-03-13 15:06:52.600141', '2026-03-24 22:09:26.961495', 3, '11', 'REFUNDED', 'O2026031315064927b38c44', 'SIMULATE', '11', '11', '11', '2026-03-24 18:28:38.777243');
 INSERT INTO `orders` VALUES (4894.00, 4894.00, '2026-03-19 14:19:50.743136', 5, 1, '2026-03-19 14:19:54.218451', '2026-03-19 14:23:29.904443', 3, '111', 'REFUNDED', 'O20260319141950fd596366', 'SIMULATE', '111', '11', '不需要了', '2026-03-19 14:23:08.879997');
-INSERT INTO `orders` VALUES (4795.00, 4795.00, '2026-03-24 22:20:30.382671', 6, 1, '2026-03-24 22:20:35.098439', '2026-03-24 22:21:33.383950', 3, '110', 'RECEIVED', 'O202603242220305710293a', 'SIMULATE', '我', '郑州', NULL, NULL);
+INSERT INTO `orders` VALUES (4795.00, 4795.00, '2026-03-24 22:20:30.382671', 6, 1, '2026-03-24 22:20:35.098439', '2026-03-31 19:31:01.106244', 3, '110', 'COMPLETED', 'O202603242220305710293a', 'SIMULATE', '我', '郑州', NULL, NULL);
 INSERT INTO `orders` VALUES (NULL, 2199.00, '2026-03-24 22:27:06.245274', 7, 1, NULL, '2026-03-24 22:27:12.523123', 3, '11', 'CANCELLED', 'O20260324222706e1dc68d3', NULL, '11', '11', NULL, NULL);
 INSERT INTO `orders` VALUES (NULL, 797.00, '2026-03-25 19:05:30.824733', 8, 1, NULL, '2026-03-25 19:05:34.719042', 3, '1111111111', 'CANCELLED', 'O20260325190530d38f5db5', NULL, '请求', '11', NULL, NULL);
 INSERT INTO `orders` VALUES (NULL, 199.00, '2026-03-26 14:16:03.612286', 9, 1, NULL, '2026-03-26 17:31:52.477908', 3, '11', 'CANCELLED', 'O2026032614160388c0f621', NULL, '11', '11', NULL, NULL);
 INSERT INTO `orders` VALUES (59.90, 59.90, '2026-03-26 18:04:07.844867', 10, 1, '2026-03-26 18:04:08.227896', '2026-03-26 19:16:38.330180', 3, '13013013010', 'COMPLETED', 'O20260326180407542b3cc8', 'WECHAT', '王', '郑州科技学院', NULL, NULL);
 INSERT INTO `orders` VALUES (2258.90, 2258.90, '2026-03-26 19:10:17.409752', 11, 1, '2026-03-26 19:10:17.665524', '2026-03-26 19:10:27.563881', 3, '13013013010', 'CANCELLED', 'O20260326191017ffc07648', 'WECHAT', '王', '郑州科技学院', NULL, NULL);
-INSERT INTO `orders` VALUES (1998.00, 1998.00, '2026-03-27 15:31:58.130842', 12, 1, '2026-03-27 15:31:58.387339', '2026-03-27 16:03:42.199533', 3, '13013013010', 'RECEIVED', 'O202603271531583caf353a', 'WECHAT', '王', '郑州科技学院', NULL, NULL);
+INSERT INTO `orders` VALUES (1998.00, 1998.00, '2026-03-27 15:31:58.130842', 12, 1, '2026-03-27 15:31:58.387339', '2026-03-31 19:27:59.593787', 3, '13013013010', 'COMPLETED', 'O202603271531583caf353a', 'WECHAT', '王', '郑州科技学院', NULL, NULL);
+INSERT INTO `orders` VALUES (9056.90, 9056.90, '2026-03-31 19:10:42.171109', 13, 1, '2026-03-31 19:10:42.426976', '2026-03-31 19:41:16.021623', 3, '13013013010', 'COMPLETED', 'O202603311910424729218a', 'WECHAT', '王', '郑州科技学院', NULL, NULL);
+INSERT INTO `orders` VALUES (9198.00, 9198.00, '2026-03-31 19:49:53.610239', 14, 1, '2026-03-31 19:49:53.863138', '2026-03-31 19:49:53.867872', 3, '13013013010', 'PAID', 'O20260331194953bfbff067', 'ALIPAY', '王', '郑州科技学院', NULL, NULL);
+INSERT INTO `orders` VALUES (99.00, 99.00, '2026-03-31 19:50:06.391255', 15, 1, '2026-03-31 19:50:06.630578', '2026-03-31 19:55:52.144273', 3, '13013013010', 'REFUND_REQUESTED', 'O20260331195006fa65b597', 'WECHAT', '王', '郑州科技学院', NULL, '2026-03-31 19:55:52.144273');
 
 -- ----------------------------
 -- Table structure for payment_record
@@ -303,7 +292,7 @@ CREATE TABLE `payment_record`  (
   `order_no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `pay_method` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of payment_record
@@ -317,6 +306,9 @@ INSERT INTO `payment_record` VALUES (4795.00, '2026-03-24 22:20:35.099491', 6, 6
 INSERT INTO `payment_record` VALUES (59.90, '2026-03-26 18:04:08.228441', 7, 10, '2026-03-26 18:04:08.228441', 'O20260326180407542b3cc8', 'WECHAT');
 INSERT INTO `payment_record` VALUES (2258.90, '2026-03-26 19:10:17.666738', 8, 11, '2026-03-26 19:10:17.666738', 'O20260326191017ffc07648', 'WECHAT');
 INSERT INTO `payment_record` VALUES (1998.00, '2026-03-27 15:31:58.387339', 9, 12, '2026-03-27 15:31:58.387339', 'O202603271531583caf353a', 'WECHAT');
+INSERT INTO `payment_record` VALUES (9056.90, '2026-03-31 19:10:42.426976', 10, 13, '2026-03-31 19:10:42.426976', 'O202603311910424729218a', 'WECHAT');
+INSERT INTO `payment_record` VALUES (9198.00, '2026-03-31 19:49:53.863138', 11, 14, '2026-03-31 19:49:53.863138', 'O20260331194953bfbff067', 'ALIPAY');
+INSERT INTO `payment_record` VALUES (99.00, '2026-03-31 19:50:06.637422', 12, 15, '2026-03-31 19:50:06.637422', 'O20260331195006fa65b597', 'WECHAT');
 
 -- ----------------------------
 -- Table structure for product
@@ -329,8 +321,6 @@ CREATE TABLE `product`  (
   `price` decimal(12, 2) NOT NULL,
   `sales` int NOT NULL,
   `stock` int NOT NULL,
-  `review_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `review_reason` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `category_id` bigint NULL DEFAULT NULL,
   `created_at` datetime(6) NOT NULL,
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -348,18 +338,20 @@ CREATE TABLE `product`  (
   `attributes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `image_list` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `unit` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `review_reason` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `review_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of product
 -- ----------------------------
-INSERT INTO `product` VALUES (b'1', b'1', 99.00, 59.90, 20, 99, 1, '2026-03-08 16:23:40.545122', 1, 1, '2026-03-26 19:49:30.503619', '迪卡侬儿童足球', '迪卡侬儿童足球小学生专用3号中考学生成人青少年训练比赛IVO2', 'http://localhost:8080/api/pub/images/view/1774511322168_1774442212560_football__2_.jpg', NULL, NULL, NULL, '<p style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774512511224_02d9e3cbcd10e5bac3edfd073ad0796.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><img src=\"http://localhost:8080/api/pub/images/view/1774513295716_d6236ccffd07f6203481edefe5a3cc6.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/>参数</p><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"text-align:center;\"><tbody><tr><th>足球重量</th><th>足球缝线</th><th>适用场地</th></tr><tr><td>350g</td><td>机缝足球</td><td>草地</td></tr></tbody></table>', 'http://localhost:8080/api/pub/images/view/1774511561302_1774509734969_1774442212560_football__2_.jpg,http://localhost:8080/api/pub/images/view/1774513467083_a5481a93f60823e1e3c75877f4c9cb6.jpg,http://localhost:8080/api/pub/images/view/1774513470349_acac7945dca6a227afa7805e4f707cb.jpg,http://localhost:8080/api/pub/images/view/1774514781883_ef57c37ed020822d3bc3d26c97502a5.jpg', '迪卡侬', NULL, NULL, '件');
-INSERT INTO `product` VALUES (b'1', b'1', 69.00, 99.00, 4, 101, 1, '2026-03-08 16:23:40.547148', 2, 1, '2026-03-26 17:32:48.033027', '安踏儿童足球', '安踏足球4号儿童小学生专用初中生中考比赛训练标准5号球官方正品', 'http://localhost:8080/api/pub/images/view/1774516049112_4c97c92ab258fe02bb0857066133f03.jpg', NULL, NULL, NULL, '<img src=\"http://localhost:8080/api/pub/images/view/1774516210004_b6fbdad355a141ad95e086de0fdf63a.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774516258540_7ca5a2c3ecd9e4e354f8f4825c727b9.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><img src=\"http://localhost:8080/api/pub/images/view/1774516326494_250271aef8399f2edac384d76ef693a.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><br/></p>', 'http://localhost:8080/api/pub/images/view/1774516054852_60239dc25003d1eb14bc1edbdcc4c29.jpg,http://localhost:8080/api/pub/images/view/1774516079338_ce03d38e9cdde0203563d77ac351a7d.jpg,http://localhost:8080/api/pub/images/view/1774516083341_4c97c92ab258fe02bb0857066133f03.jpg,http://localhost:8080/api/pub/images/view/1774516091756_edbdf54fbfccd107f0eb8757faac5f6.jpg', '安踏', NULL, NULL, '件');
-INSERT INTO `product` VALUES (b'1', b'1', 2499.00, 1899.00, 13, 12, 3, '2026-03-08 16:23:40.548299', 3, 1, '2026-03-27 15:31:58.400413', '立久佳猛犸跑步机', '立久佳猛犸跑步机家用款折叠爬坡静音小型室内家庭新款健身房专用', 'http://localhost:8080/api/pub/images/view/1774516799208_df50af8402564e7446921eb829a8e58.jpg', NULL, NULL, NULL, '<p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774516822137_49b4ff4b4ee8e11d2e0c6fa997ff7a1.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><img src=\"http://localhost:8080/api/pub/images/view/1774516844168_084eca51b7871e459f9746051f2ba95.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774516867528_317cda1d8088d99036e079e2bb4694c.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p>', NULL, '利久佳', NULL, NULL, '件');
-INSERT INTO `product` VALUES (b'1', b'1', 199.00, 99.00, 8, 99, 1, '2026-03-08 16:23:40.549535', 4, 1, '2026-03-27 15:31:58.400413', '李宁羽毛球套装', '李宁羽毛球拍雷霆9官方正品凯胜昊天锤8单双拍套装旗舰碳素纤维店', 'http://localhost:8080/api/pub/images/view/1774517190662_019b2a577e16f58b09be74b5257a3b2.jpg', NULL, NULL, NULL, '', 'http://localhost:8080/api/pub/images/view/1774517202598_be6b842175ce0edfd1f29b4a7597100.jpg,http://localhost:8080/api/pub/images/view/1774517211278_4c7f82f4a5de21611bc0d3e9e68e2e7.jpg,http://localhost:8080/api/pub/images/view/1774517220512_a53314f000d87a59c5df5fb77d5c730.jpg,http://localhost:8080/api/pub/images/view/1774517229128_397931925fd77ded45cd076a82fad23.jpg', '李宁', NULL, NULL, '件');
-INSERT INTO `product` VALUES (b'1', b'1', 2999.00, 2199.00, 1, 100, 6, '2026-03-13 15:27:48.018899', 8, 1, '2026-03-26 19:10:27.563881', '福特山地自行车', 'Ford福特LM350山地车成人探路者单车学生女款LM380男式山地自行车', 'http://localhost:8080/api/pub/images/view/1774517819328_8a48660db5767d675acc1aa609406d2.jpg', NULL, NULL, NULL, '<p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774517962692_0d588f35ce07682fecb70c8f392575b.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774517978177_a2ceb7547d68692d327a8a66bfd9014.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774517999101_6c8b57910571d95cd0587036f775879.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774518018824_b33547b1d65d9a85221d29cdf235cc2.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p>', 'http://localhost:8080/api/pub/images/view/1774517826185_9294e25e3d5880e9f7cc721d79ffdff.jpg,http://localhost:8080/api/pub/images/view/1774517833261_dd498429abf209ee760ee0be60cf3d1.jpg,http://localhost:8080/api/pub/images/view/1774517840499_6b24664e87f1d9f50e158243fa0d7b2.jpg,http://localhost:8080/api/pub/images/view/1774517849136_df2f39228219a92d64ccdf3fadd6fe3.jpg,http://localhost:8080/api/pub/images/view/1774517854150_8a48660db5767d675acc1aa609406d2.jpg', '福特', NULL, NULL, '件');
-INSERT INTO `product` VALUES (b'1', b'1', 7299.00, 6999.00, 0, 10, 13, '2026-03-27 16:32:42.169199', 14, 1, '2026-03-27 16:32:42.169199', 'ATOMIC阿托米克滑雪双板2526新品', 'ATOMIC阿托米克滑雪双板2526新品小回转进阶滑雪板Redster S9I', 'http://localhost:8080/api/pub/images/view/1774600155582_f2e77b97878dc4c78b4254824dc125a.jpg', NULL, NULL, NULL, '<p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600227987_b3ef126c27d0995dcc34c7c1320c6b6.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><img src=\"http://localhost:8080/api/pub/images/view/1774600257237_945eca7037c3e44e82cd198b62b0292.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600270664_d18b5f6b75895948f634902c40612b6.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600280360_2ef54447705da6b4e283c656be16bc1.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600292659_bd4130839e1656be1f71df650f84dbf.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600311095_45f0d0982807289ebb512c419fd07bb.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p>', NULL, 'ATOMIC', NULL, NULL, '件');
+INSERT INTO `product` VALUES (b'1', b'1', 99.00, 59.90, 21, 98, 1, '2026-03-08 16:23:40.545122', 1, 1, '2026-03-31 19:10:42.441372', '迪卡侬儿童足球', '迪卡侬儿童足球小学生专用3号中考学生成人青少年训练比赛IVO2', 'http://localhost:8080/api/pub/images/view/1774511322168_1774442212560_football__2_.jpg', NULL, NULL, NULL, '<p style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774512511224_02d9e3cbcd10e5bac3edfd073ad0796.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><img src=\"http://localhost:8080/api/pub/images/view/1774513295716_d6236ccffd07f6203481edefe5a3cc6.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/>参数</p><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"text-align:center;\"><tbody><tr><th>足球重量</th><th>足球缝线</th><th>适用场地</th></tr><tr><td>350g</td><td>机缝足球</td><td>草地</td></tr></tbody></table>', 'http://localhost:8080/api/pub/images/view/1774511561302_1774509734969_1774442212560_football__2_.jpg,http://localhost:8080/api/pub/images/view/1774513467083_a5481a93f60823e1e3c75877f4c9cb6.jpg,http://localhost:8080/api/pub/images/view/1774513470349_acac7945dca6a227afa7805e4f707cb.jpg,http://localhost:8080/api/pub/images/view/1774514781883_ef57c37ed020822d3bc3d26c97502a5.jpg', '迪卡侬', NULL, NULL, '件', NULL, 'APPROVED');
+INSERT INTO `product` VALUES (b'1', b'1', 69.00, 99.00, 4, 101, 1, '2026-03-08 16:23:40.547148', 2, 1, '2026-03-30 13:45:13.600891', '安踏儿童足球', '安踏足球4号儿童小学生专用初中生中考比赛训练标准5号球官方正品', 'http://localhost:8080/api/pub/images/view/1774516049112_4c97c92ab258fe02bb0857066133f03.jpg', NULL, NULL, NULL, '<img src=\"http://localhost:8080/api/pub/images/view/1774516210004_b6fbdad355a141ad95e086de0fdf63a.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774516258540_7ca5a2c3ecd9e4e354f8f4825c727b9.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><img src=\"http://localhost:8080/api/pub/images/view/1774516326494_250271aef8399f2edac384d76ef693a.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><br/></p>', 'http://localhost:8080/api/pub/images/view/1774516054852_60239dc25003d1eb14bc1edbdcc4c29.jpg,http://localhost:8080/api/pub/images/view/1774516079338_ce03d38e9cdde0203563d77ac351a7d.jpg,http://localhost:8080/api/pub/images/view/1774516083341_4c97c92ab258fe02bb0857066133f03.jpg,http://localhost:8080/api/pub/images/view/1774516091756_edbdf54fbfccd107f0eb8757faac5f6.jpg', '安踏', NULL, NULL, '件', NULL, 'APPROVED');
+INSERT INTO `product` VALUES (b'1', b'1', 2499.00, 1899.00, 14, 11, 3, '2026-03-08 16:23:40.548299', 3, 1, '2026-03-31 19:10:42.441372', '立久佳猛犸跑步机', '立久佳猛犸跑步机家用款折叠爬坡静音小型室内家庭新款健身房专用', 'http://localhost:8080/api/pub/images/view/1774516799208_df50af8402564e7446921eb829a8e58.jpg', NULL, NULL, NULL, '<p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774516822137_49b4ff4b4ee8e11d2e0c6fa997ff7a1.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><img src=\"http://localhost:8080/api/pub/images/view/1774516844168_084eca51b7871e459f9746051f2ba95.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774516867528_317cda1d8088d99036e079e2bb4694c.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p>', NULL, '利久佳', NULL, NULL, '件', NULL, 'APPROVED');
+INSERT INTO `product` VALUES (b'1', b'1', 199.00, 99.00, 10, 97, 1, '2026-03-08 16:23:40.549535', 4, 1, '2026-03-31 19:50:06.640959', '李宁羽毛球套装', '李宁羽毛球拍雷霆9官方正品凯胜昊天锤8单双拍套装旗舰碳素纤维店', 'http://localhost:8080/api/pub/images/view/1774517190662_019b2a577e16f58b09be74b5257a3b2.jpg', NULL, NULL, NULL, '', 'http://localhost:8080/api/pub/images/view/1774517202598_be6b842175ce0edfd1f29b4a7597100.jpg,http://localhost:8080/api/pub/images/view/1774517211278_4c7f82f4a5de21611bc0d3e9e68e2e7.jpg,http://localhost:8080/api/pub/images/view/1774517220512_a53314f000d87a59c5df5fb77d5c730.jpg,http://localhost:8080/api/pub/images/view/1774517229128_397931925fd77ded45cd076a82fad23.jpg', '李宁', NULL, NULL, '件', NULL, 'APPROVED');
+INSERT INTO `product` VALUES (b'1', b'1', 2999.00, 2199.00, 2, 99, 6, '2026-03-13 15:27:48.018899', 8, 1, '2026-03-31 19:49:53.867872', '福特山地自行车', 'Ford福特LM350山地车成人探路者单车学生女款LM380男式山地自行车', 'http://localhost:8080/api/pub/images/view/1774517819328_8a48660db5767d675acc1aa609406d2.jpg', NULL, NULL, NULL, '<p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774517962692_0d588f35ce07682fecb70c8f392575b.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774517978177_a2ceb7547d68692d327a8a66bfd9014.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774517999101_6c8b57910571d95cd0587036f775879.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774518018824_b33547b1d65d9a85221d29cdf235cc2.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p>', 'http://localhost:8080/api/pub/images/view/1774517826185_9294e25e3d5880e9f7cc721d79ffdff.jpg,http://localhost:8080/api/pub/images/view/1774517833261_dd498429abf209ee760ee0be60cf3d1.jpg,http://localhost:8080/api/pub/images/view/1774517840499_6b24664e87f1d9f50e158243fa0d7b2.jpg,http://localhost:8080/api/pub/images/view/1774517849136_df2f39228219a92d64ccdf3fadd6fe3.jpg,http://localhost:8080/api/pub/images/view/1774517854150_8a48660db5767d675acc1aa609406d2.jpg', '福特', NULL, NULL, '件', NULL, 'APPROVED');
+INSERT INTO `product` VALUES (b'1', b'1', 7299.00, 6999.00, 2, 8, 13, '2026-03-27 16:32:42.169199', 14, 1, '2026-03-31 19:49:53.867872', 'ATOMIC阿托米克滑雪双板2526新品', 'ATOMIC阿托米克滑雪双板2526新品小回转进阶滑雪板Redster S9I', 'http://localhost:8080/api/pub/images/view/1774600155582_f2e77b97878dc4c78b4254824dc125a.jpg', NULL, NULL, NULL, '<p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600227987_b3ef126c27d0995dcc34c7c1320c6b6.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/><br/><img src=\"http://localhost:8080/api/pub/images/view/1774600257237_945eca7037c3e44e82cd198b62b0292.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600270664_d18b5f6b75895948f634902c40612b6.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600280360_2ef54447705da6b4e283c656be16bc1.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600292659_bd4130839e1656be1f71df650f84dbf.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p><p data-we-empty-p=\"\" style=\"text-align:center;\"><img src=\"http://localhost:8080/api/pub/images/view/1774600311095_45f0d0982807289ebb512c419fd07bb.jpg\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"50%\"/></p>', NULL, 'ATOMIC', NULL, NULL, '件', NULL, 'APPROVED');
 
 -- ----------------------------
 -- Table structure for product_review
@@ -374,11 +366,14 @@ CREATE TABLE `product_review`  (
   `user_id` bigint NOT NULL,
   `content` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of product_review
 -- ----------------------------
+INSERT INTO `product_review` VALUES (5, '2026-03-31 19:31:00.735696', 8, 6, 2, 3, '<p>非常好用，适合新手</p>');
+INSERT INTO `product_review` VALUES (5, '2026-03-31 19:41:15.672746', 9, 13, 1, 3, '<p><img src=\"http://localhost:8080/api/pub/images/view/1774957269023_5cde0146-5376-40bb-88eb-c5eb62a34fc4.png\" style=\"max-width:100%;\" contenteditable=\"false\" width=\"30%\"/></p><p>东西非常好用</p>');
+INSERT INTO `product_review` VALUES (5, '2026-03-31 19:54:28.262762', 10, 15, 4, 3, '<p>商品非常好</p>');
 
 -- ----------------------------
 -- Table structure for product_sku
@@ -422,34 +417,11 @@ CREATE TABLE `product_spec`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_product`(`product_id` ASC) USING BTREE,
   CONSTRAINT `product_spec_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of product_spec
 -- ----------------------------
-
--- ----------------------------
--- Table structure for shop
--- ----------------------------
-DROP TABLE IF EXISTS `shop`;
-CREATE TABLE `shop`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(6) NOT NULL,
-  `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `logo` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `merchant_id` bigint NOT NULL,
-  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `updated_at` datetime(6) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `UK2oyqeiiol473xsir1ktfcarlp`(`merchant_id` ASC) USING BTREE,
-  UNIQUE INDEX `idx_shop_merchant_id`(`merchant_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of shop
--- ----------------------------
-INSERT INTO `shop` VALUES (1, '2026-03-18 18:31:24.393290', 'auto', NULL, 6, 'new-m_62cf2731', 'ENABLED', '2026-03-18 18:31:24.393290');
 
 -- ----------------------------
 -- Table structure for sys_user

@@ -67,9 +67,7 @@
         </div>
       </div>
       <span slot="footer">
-        <el-button class="btn-secondary" @click="refundDialogVisible = false"
-          >拒绝</el-button
-        >
+        <el-button class="btn-secondary" @click="rejectRefund">拒绝</el-button>
         <el-button type="primary" class="btn-primary" @click="acceptRefund"
           >同意退货</el-button
         >
@@ -79,7 +77,13 @@
 </template>
 
 <script>
-import { getOrders, shipOrder, acceptRefund } from "@/api/merchant";
+import {
+  getOrders,
+  getOrderDetail,
+  shipOrder,
+  acceptRefund,
+  rejectRefund,
+} from "@/api/merchant";
 
 export default {
   name: "MerchantOrders",
@@ -131,8 +135,14 @@ export default {
       });
     },
     showRefundDialog(order) {
-      this.currentOrder = order;
-      this.refundDialogVisible = true;
+      getOrderDetail(order.id).then((res) => {
+        if (res.code === 200 && res.data && res.data.order) {
+          this.currentOrder = res.data.order;
+          this.refundDialogVisible = true;
+        } else {
+          this.$message.error(res.message || "获取订单详情失败");
+        }
+      });
     },
     acceptRefund() {
       if (!this.currentOrder) return;
@@ -140,8 +150,21 @@ export default {
         if (res.code === 200) {
           this.$message.success("已同意退货");
           this.refundDialogVisible = false;
-          this.list.find((o) => o.id === this.currentOrder.id).status =
-            "REFUNDED";
+          const order = this.list.find((o) => o.id === this.currentOrder.id);
+          if (order) order.status = "REFUNDED";
+        } else {
+          this.$message.error(res.message || "操作失败");
+        }
+      });
+    },
+    rejectRefund() {
+      if (!this.currentOrder) return;
+      rejectRefund(this.currentOrder.id).then((res) => {
+        if (res.code === 200) {
+          this.$message.success("已拒绝退货");
+          this.refundDialogVisible = false;
+          const order = this.list.find((o) => o.id === this.currentOrder.id);
+          if (order) order.status = "RECEIVED";
         } else {
           this.$message.error(res.message || "操作失败");
         }

@@ -57,7 +57,7 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    /** 运营关联：仅当 role=MERCHANT 时有效 */
+    /** 商家关联：仅当 role=MERCHANT 时有效 */
     @Column(name = "merchant_id")
     private Long merchantId;
 

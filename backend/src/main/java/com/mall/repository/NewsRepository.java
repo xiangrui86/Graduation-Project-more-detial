@@ -15,4 +15,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     Page<News> findByPublishedTrueAndTypeNotOrderByCreatedAtDesc(String type, Pageable pageable);
 
     List<News> findByPublishedTrueAndTypeOrderByCreatedAtDesc(String type, Pageable pageable);
+
+    boolean existsByTitleAndTypeAndPublishedTrue(String title, String type);
 }

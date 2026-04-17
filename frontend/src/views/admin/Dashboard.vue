@@ -3,7 +3,7 @@
     <div class="dashboard-header">
       <div class="header-content">
         <h1 class="page-title">数据看板</h1>
-        <p class="page-subtitle">实时掌握平台运营状况</p>
+        <p class="page-subtitle">实时掌握平台商家状况</p>
       </div>
       <div class="header-decoration"></div>
     </div>

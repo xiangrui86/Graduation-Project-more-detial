@@ -35,13 +35,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             """,
             countQuery = """
             SELECT count(p) FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             """)
     Page<Product> findPublicOnSale(Pageable pageable);
 
@@ -50,23 +50,39 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
               AND p.categoryId = :categoryId
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             """,
             countQuery = """
             SELECT count(p) FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
               AND p.categoryId = :categoryId
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             """)
     Page<Product> findPublicByCategory(Long categoryId, Pageable pageable);
+
+    @Query(value = """
+            SELECT p FROM Product p
+            WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
+              AND p.categoryId IN :categoryIds
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
+            """,
+            countQuery = """
+            SELECT count(p) FROM Product p
+            WHERE p.onSale = true
+              AND p.reviewStatus = 'APPROVED'
+              AND p.categoryId IN :categoryIds
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
+            """)
+    Page<Product> findPublicByCategoryIds(List<Long> categoryIds, Pageable pageable);
 
     @Query("""
             SELECT p FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
               AND p.isNew = true
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             ORDER BY p.createdAt DESC
             """)
     List<Product> findPublicNewArrivals(Pageable pageable);
@@ -75,7 +91,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             ORDER BY p.sales DESC
             """)
     List<Product> findPublicSalesRank(Pageable pageable);
@@ -85,7 +101,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
               AND p.id IN :ids
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             """)
     List<Product> findPublicByIdIn(List<Long> ids);
 
@@ -94,7 +110,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             WHERE p.id = :id
               AND p.onSale = true
               AND p.reviewStatus = 'APPROVED'
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
             """)
     Optional<Product> findPublicById(Long id);
 
@@ -102,14 +118,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
               AND (p.name LIKE %:keyword% OR (p.description IS NOT NULL AND p.description LIKE %:keyword%))
             """,
             countQuery = """
             SELECT count(p) FROM Product p
             WHERE p.onSale = true
               AND p.reviewStatus = 'APPROVED'
-              AND p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true)
+              AND (p.merchantId = 0 OR p.merchantId IN (SELECT m.id FROM Merchant m WHERE m.enabled = true))
               AND (p.name LIKE %:keyword% OR (p.description IS NOT NULL AND p.description LIKE %:keyword%))
             """)
     Page<Product> findPublicByNameContaining(String keyword, Pageable pageable);

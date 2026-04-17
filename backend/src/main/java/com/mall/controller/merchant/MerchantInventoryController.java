@@ -16,21 +16,21 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/merchant/inventory")
 @RequiredArgsConstructor
-/** 运营库存管理接口：库存查询、调整、入库、出库记录。 */
+/** 商家库存管理接口：库存查询、调整、入库、出库记录。 */
 public class MerchantInventoryController {
 
     private final ProductService productService;
     private final UserRepository userRepository;
 
-    /** 获取当前运营 ID（由登录用户映射）。 */
+    /** 获取当前商家 ID（由登录用户映射）。 */
     private Long currentMerchantId(Authentication auth) {
         Long userId = (Long) auth.getPrincipal();
         User u = userRepository.findById(userId).orElseThrow();
-        if (u.getMerchantId() == null) throw new RuntimeException("非运营账号");
+        if (u.getMerchantId() == null) throw new RuntimeException("非商家账号");
         return u.getMerchantId();
     }
 
-    /** 分页查询当前运营的商品库存。 */
+    /** 分页查询当前商家的商品库存。 */
     @GetMapping
     public Result<?> list(
             Authentication auth,

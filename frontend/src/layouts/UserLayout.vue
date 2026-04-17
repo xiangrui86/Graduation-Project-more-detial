@@ -38,13 +38,26 @@
         </div>
 
         <div class="right">
-          <span class="pill">
-            <span class="dot" />
-            {{ user && user.nickname }}
-          </span>
-          <el-button size="small" type="primary" @click="logout"
-            >退出</el-button
-          >
+          <template v-if="user">
+            <span class="pill">
+              <span class="dot" />
+              {{ user.nickname }}
+            </span>
+            <el-button size="small" type="primary" @click="logout"
+              >退出</el-button
+            >
+          </template>
+          <template v-else>
+            <el-button size="small" type="text" @click="$router.push('/login')"
+              >登录</el-button
+            >
+            <el-button
+              size="small"
+              type="primary"
+              @click="$router.push('/register')"
+              >注册</el-button
+            >
+          </template>
         </div>
       </header>
 

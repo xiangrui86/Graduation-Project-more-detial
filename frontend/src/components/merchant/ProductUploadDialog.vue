@@ -28,21 +28,39 @@
       <!-- 商品分类 -->
       <el-form-item label="商品分类" prop="categoryId">
         <el-select
-          v-model="form.categoryId"
-          placeholder="请选择商品分类"
+          v-model="selectedCategoryParentId"
+          placeholder="请选择商品大类"
           filterable
           clearable
           class="category-select"
-          @visible-change="handleCategoryDropDown"
+          @change="onParentCategoryChange"
         >
           <el-option
-            v-for="c in categories"
+            v-for="c in parentCategories"
             :key="c.id"
             :label="c.name"
             :value="c.id"
           />
         </el-select>
-        <div class="category-tip">或者在下方输入自定义分类</div>
+        <el-select
+          v-if="selectedCategoryParentId != null"
+          v-model="selectedCategoryChildId"
+          placeholder="请选择商品子类"
+          filterable
+          clearable
+          class="category-select child-select"
+          @change="onChildCategoryChange"
+        >
+          <el-option
+            v-for="c in childCategories"
+            :key="c.id"
+            :label="c.name"
+            :value="c.id"
+          />
+        </el-select>
+        <div class="category-tip">
+          请选择分类大类后再选择子类，或者在下方输入自定义分类
+        </div>
       </el-form-item>
 
       <!-- 自定义分类 -->
@@ -293,6 +311,8 @@ export default {
       uploadingDialog: false,
       uploadProgress: 0,
       categories: [],
+      selectedCategoryParentId: null,
+      selectedCategoryChildId: null,
       editor: null,
       form: {
         name: "",
@@ -357,6 +377,19 @@ export default {
       this.$emit("update:visible", val);
     },
   },
+  computed: {
+    parentCategories() {
+      return (this.categories || []).filter((c) => c.parentId == null);
+    },
+    childCategories() {
+      if (this.selectedCategoryParentId == null) return [];
+      return (this.categories || []).filter(
+        (c) =>
+          c.parentId != null &&
+          Number(c.parentId) === Number(this.selectedCategoryParentId),
+      );
+    },
+  },
   mounted() {
     this.$nextTick(() => {
       this.initEditor();
@@ -378,12 +411,12 @@ export default {
       this.editor.config.zIndex = 1000;
       this.editor.config.uploadImgServer = "/api/pub/images/upload";
       this.editor.config.uploadFileName = "file";
-      
+
       // 自定义上传图片处理
       const self = this;
       this.editor.config.customUploadImg = function (resultFiles, insertImgFn) {
         console.log("开始上传图片，文件数：", resultFiles?.length);
-        
+
         if (!resultFiles || resultFiles.length === 0) {
           self.$message.warning("请选择图片");
           return;
@@ -391,13 +424,13 @@ export default {
 
         resultFiles.forEach((file, index) => {
           console.log(`上传第 ${index + 1} 张图片:`, file.name);
-          
+
           const formData = new FormData();
           formData.append("file", file);
 
           const token = localStorage.getItem("token");
           const headers = token ? { Authorization: `Bearer ${token}` } : {};
-          
+
           console.log("发送上传请求，Headers:", headers);
 
           fetch("/api/pub/images/upload", {
@@ -411,7 +444,7 @@ export default {
             })
             .then((res) => {
               console.log("后端返回数据:", res);
-              
+
               if (res.code === 200 && res.data && res.data.url) {
                 console.log("图片上传成功，URL:", res.data.url);
                 // insertImgFn 用来插入图片
@@ -424,7 +457,9 @@ export default {
             })
             .catch((error) => {
               console.error("上传异常:", error);
-              self.$message.error("图片上传异常: " + (error.message || "网络错误"));
+              self.$message.error(
+                "图片上传异常: " + (error.message || "网络错误"),
+              );
             });
         });
       };
@@ -432,7 +467,7 @@ export default {
       // 配置其他选项
       this.editor.config.zIndex = 1000;
       this.editor.config.height = 300;
-      
+
       this.editor.create();
 
       if (this.editingProduct && this.form.detailDescription) {
@@ -480,6 +515,7 @@ export default {
           } else if (res.data && Array.isArray(res.data.content)) {
             this.categories = res.data.content;
           }
+          this.syncCategorySelection();
         })
         .catch(() => {
           this.$message.error("加载分类失败");
@@ -582,7 +618,41 @@ export default {
     removeDetailImage(index) {
       this.form.images.splice(index, 1);
     },
-
+    onParentCategoryChange(id) {
+      this.selectedCategoryParentId = id;
+      this.selectedCategoryChildId = null;
+      if (this.childCategories.length === 0) {
+        this.form.categoryId = id;
+      } else {
+        this.form.categoryId = null;
+      }
+    },
+    onChildCategoryChange(id) {
+      this.selectedCategoryChildId = id;
+      this.form.categoryId = id;
+    },
+    syncCategorySelection() {
+      if (!this.form.categoryId) {
+        this.selectedCategoryParentId = null;
+        this.selectedCategoryChildId = null;
+        return;
+      }
+      const category = (this.categories || []).find(
+        (c) => Number(c.id) === Number(this.form.categoryId),
+      );
+      if (!category) {
+        this.selectedCategoryParentId = null;
+        this.selectedCategoryChildId = null;
+        return;
+      }
+      if (category.parentId == null) {
+        this.selectedCategoryParentId = category.id;
+        this.selectedCategoryChildId = null;
+      } else {
+        this.selectedCategoryParentId = category.parentId;
+        this.selectedCategoryChildId = category.id;
+      }
+    },
     formatProgress(percentage) {
       return percentage + "%";
     },
@@ -610,6 +680,8 @@ export default {
         isNew: true,
         onSale: true,
       };
+      this.selectedCategoryParentId = null;
+      this.selectedCategoryChildId = null;
 
       if (this.editor) {
         this.editor.txt.clear();
@@ -619,6 +691,15 @@ export default {
     },
 
     handleSubmit() {
+      // 如果选择了子类，则以子类为最终分类；如果只有父类可选，则使用父类
+      if (this.selectedCategoryChildId) {
+        this.form.categoryId = this.selectedCategoryChildId;
+      } else if (
+        this.selectedCategoryParentId &&
+        !this.childCategories.length
+      ) {
+        this.form.categoryId = this.selectedCategoryParentId;
+      }
       this.form.detailDescription = this.editor ? this.editor.txt.html() : "";
 
       this.$refs.productForm.validate(async (valid) => {

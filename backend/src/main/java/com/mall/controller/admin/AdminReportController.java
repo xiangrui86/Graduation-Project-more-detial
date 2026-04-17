@@ -2,8 +2,10 @@ package com.mall.controller.admin;
 
 import com.mall.common.Role;
 import com.mall.dto.Result;
+import com.mall.entity.Category;
 import com.mall.entity.Order;
 import com.mall.entity.Product;
+import com.mall.repository.CategoryRepository;
 import com.mall.repository.OrderRepository;
 import com.mall.repository.ProductRepository;
 import com.mall.repository.UserRepository;
@@ -28,6 +30,7 @@ public class AdminReportController {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     private final OrderRepository orderRepository;
 
     /** 后台看板数据：用户数、商品数、订单数、总销售额。 */
@@ -96,8 +99,7 @@ public class AdminReportController {
     /** 分类销售占比 */
     private List<Map<String, Object>> getCategorySalesData() {
         Map<Long, Integer> categorySalesMap = new HashMap<>();
-        Map<Long, String> categoryNameMap = new HashMap<>();
-        
+
         // 统计各分类的销售额
         List<Product> allProducts = productRepository.findAll();
         for (Product product : allProducts) {
@@ -107,18 +109,21 @@ public class AdminReportController {
                     product.getCategoryId(),
                     categorySalesMap.getOrDefault(product.getCategoryId(), 0) + value
                 );
-                // 简单映射分类ID到名称（实际应该从Category表获取）
-                categoryNameMap.put(product.getCategoryId(), "分类" + product.getCategoryId());
             }
         }
-        
+
+        // 从分类表加载名称映射
+        Map<Long, String> categoryNameMap = categoryRepository.findAllById(categorySalesMap.keySet()).stream()
+                .collect(Collectors.toMap(Category -> Category.getId(), Category -> Category.getName()));
+
         // 转换为所需格式
         return categorySalesMap.entrySet().stream()
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .limit(5)
                 .map(e -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("name", categoryNameMap.get(e.getKey()));
+                    String categoryName = categoryNameMap.getOrDefault(e.getKey(), "分类" + e.getKey());
+                    map.put("name", categoryName);
                     map.put("value", e.getValue());
                     return map;
                 })

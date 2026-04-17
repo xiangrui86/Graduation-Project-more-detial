@@ -21,7 +21,7 @@
           <el-menu :default-active="$route.path" router class="menu">
             <el-menu-item index="/admin">数据报表</el-menu-item>
             <el-menu-item index="/admin/users">用户管理</el-menu-item>
-            <el-menu-item index="/admin/merchants">运营管理</el-menu-item>
+            <el-menu-item index="/admin/merchants">商家管理</el-menu-item>
             <el-menu-item index="/admin/categories">分类管理</el-menu-item>
             <el-menu-item index="/admin/orders">交易管理</el-menu-item>
             <el-menu-item index="/admin/products">商品审核</el-menu-item>

@@ -3,7 +3,7 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-// 路由表：按用户、管理员、运营三类角色划分
+// 路由表：按用户、管理员、商家三类角色划分
 const routes = [
   {
     path: "/login",
@@ -12,9 +12,14 @@ const routes = [
     meta: { guest: true },
   },
   {
+    path: "/register",
+    name: "Register",
+    component: () => import("@/views/Login.vue"),
+    meta: { guest: true },
+  },
+  {
     path: "/",
     component: () => import("@/layouts/UserLayout.vue"),
-    meta: { role: "USER" },
     children: [
       {
         path: "",
@@ -35,26 +40,31 @@ const routes = [
         path: "cart",
         name: "Cart",
         component: () => import("@/views/user/Cart.vue"),
+        meta: { auth: true, role: "USER" },
       },
       {
         path: "favorite",
         name: "Favorite",
         component: () => import("@/views/user/Favorite.vue"),
+        meta: { auth: true, role: "USER" },
       },
       {
         path: "orders",
         name: "MyOrders",
         component: () => import("@/views/user/MyOrders.vue"),
+        meta: { auth: true, role: "USER" },
       },
       {
         path: "profile",
         name: "UserProfile",
         component: () => import("@/views/user/Profile.vue"),
+        meta: { auth: true, role: "USER" },
       },
       {
         path: "address-book",
         name: "AddressBook",
         component: () => import("@/views/user/AddressBook.vue"),
+        meta: { auth: true, role: "USER" },
       },
       {
         path: "new",
@@ -89,13 +99,14 @@ const routes = [
         path: "chat",
         name: "UserChat",
         component: () => import("@/views/user/Chat.vue"),
+        meta: { auth: true, role: "USER" },
       },
     ],
   },
   {
     path: "/admin",
     component: () => import("@/layouts/AdminLayout.vue"),
-    meta: { role: "ADMIN" },
+    meta: { auth: true, role: "ADMIN" },
     children: [
       {
         path: "",
@@ -147,7 +158,7 @@ const routes = [
   {
     path: "/merchant",
     component: () => import("@/layouts/MerchantLayout.vue"),
-    meta: { role: "MERCHANT" },
+    meta: { auth: true, role: "MERCHANT" },
     children: [
       {
         path: "",
@@ -179,6 +190,11 @@ const routes = [
         name: "MerchantOrders",
         component: () => import("@/views/merchant/Orders.vue"),
       },
+      {
+        path: "chat",
+        name: "MerchantChatCenter",
+        component: () => import("@/views/merchant/ChatCenter.vue"),
+      },
     ],
   },
 ];
@@ -201,13 +217,17 @@ router.beforeEach((to, from, next) => {
     } else next();
     return;
   }
-  if (!user || !user.token) {
+  if (to.meta.auth && (!user || !user.token)) {
+    next("/login");
+    return;
+  }
+  if (to.meta.role && (!user || !user.token)) {
     next("/login");
     return;
   }
   if (to.meta.role && to.meta.role !== user.role) {
-    if (user.role === "ADMIN") next("/admin");
-    else if (user.role === "MERCHANT") next("/merchant");
+    if (user && user.role === "ADMIN") next("/admin");
+    else if (user && user.role === "MERCHANT") next("/merchant");
     else next("/");
     return;
   }

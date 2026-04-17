@@ -2,7 +2,7 @@ import request from "./request";
 
 /**
  * 管理端接口集合
- * 用于用户、运营、分类、商品、订单、资讯等后台管理能力。
+ * 用于用户、商家、分类、商品、订单、资讯等后台管理能力。
  */
 
 /** 获取管理端看板数据 */
@@ -30,27 +30,27 @@ export function deleteUser(id) {
   return request.delete(`/admin/user/${id}`);
 }
 
-/** 查询运营列表 */
+/** 查询商家列表 */
 export function getMerchants() {
   return request.get("/admin/merchant");
 }
 
-/** 新增运营 */
+/** 新增商家 */
 export function createMerchant(data) {
   return request.post("/admin/merchant", data);
 }
 
-/** 更新运营 */
+/** 更新商家 */
 export function updateMerchant(id, data) {
   return request.put(`/admin/merchant/${id}`, data);
 }
 
-/** 删除运营 */
+/** 删除商家 */
 export function deleteMerchant(id) {
   return request.delete(`/admin/merchant/${id}`);
 }
 
-/** 绑定运营负责人账号 */
+/** 绑定商家负责人账号 */
 export function setMerchantOwner(id, ownerUserId) {
   return request.put(`/admin/merchant/${id}/owner`, { ownerUserId });
 }
@@ -83,6 +83,11 @@ export function getOrders(params) {
 /** 查询订单详情 */
 export function getOrderDetail(id) {
   return request.get(`/admin/order/${id}`);
+}
+
+/** 修改订单状态 */
+export function updateOrderStatus(id, status) {
+  return request.post(`/admin/order/${id}/status`, { status });
 }
 
 /** 查询资讯/公告列表 */
@@ -132,9 +137,24 @@ export function getProducts(params) {
   return request.get("/admin/product", { params });
 }
 
+/** 管理端创建商品 */
+export function createProduct(data) {
+  return request.post("/admin/product", data);
+}
+
 /** 管理端商品详情 */
 export function getProduct(id) {
   return request.get(`/admin/product/${id}`);
+}
+
+/** 管理端更新商品 */
+export function updateProduct(id, data) {
+  return request.put(`/admin/product/${id}`, data);
+}
+
+/** 管理端删除商品 */
+export function deleteProduct(id) {
+  return request.delete(`/admin/product/${id}`);
 }
 
 /** 管理端审核通过 */

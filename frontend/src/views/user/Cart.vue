@@ -156,12 +156,11 @@
           class="checkout-btn"
           @click="showCheckout = true"
         >
-          去结算 ({{ items.length }})
+          提交订单 ({{ items.length }})
         </el-button>
       </div>
     </div>
 
-    <!-- 结算弹窗 -->
     <el-dialog
       title="确认订单"
       :visible.sync="showCheckout"
@@ -247,11 +246,14 @@
           <div class="payment-name">支付宝</div>
         </div>
       </div>
+      <div class="payment-tip">
+        订单提交后请在 30 分钟内完成支付，超时未付款系统将自动取消订单。
+      </div>
 
       <span slot="footer">
         <el-button @click="showCheckout = false">取消</el-button>
         <el-button type="primary" :loading="submitting" @click="submitOrder">
-          确认购买
+          提交订单
         </el-button>
       </span>
     </el-dialog>
@@ -263,6 +265,12 @@
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
+}
+
+.payment-tip {
+  color: #718096;
+  font-size: 12px;
+  margin-bottom: 16px;
 }
 
 .payment-option {
@@ -312,7 +320,6 @@ import {
   updateCartQuantity,
   removeCart,
   createOrder,
-  payOrder,
   getProfile,
 } from "@/api/user";
 import request from "@/api/request";
@@ -441,32 +448,13 @@ export default {
         receiverAddress: f.receiverAddress,
       })
         .then((res) => {
+          this.submitting = false;
           if (res.code === 200 && res.data && res.data.id) {
-            // 订单创建成功，获得订单ID
-            const orderId = res.data.id;
-            // 立即发起支付请求
-            payOrder(orderId, { paymentMethod: f.paymentMethod })
-              .then((payRes) => {
-                this.submitting = false;
-                if (payRes.code === 200) {
-                  this.$message.success("购买成功！");
-                  this.showCheckout = false;
-                  this.load();
-                  this.$router.push("/orders");
-                } else {
-                  this.$message.error(payRes.message || "支付失败，订单已保存，请前往我的订单尝试重新支付");
-                  this.showCheckout = false;
-                  this.$router.push("/orders");
-                }
-              })
-              .catch(() => {
-                this.submitting = false;
-                this.$message.error("支付失败，订单已保存，请前往我的订单尝试重新支付");
-                this.showCheckout = false;
-                this.$router.push("/orders");
-              });
+            this.$message.success("订单已提交，请在 30 分钟内前往我的订单完成支付");
+            this.showCheckout = false;
+            this.load();
+            this.$router.push("/orders");
           } else {
-            this.submitting = false;
             this.$message.error(res.message || "下单失败，请重试");
           }
         })

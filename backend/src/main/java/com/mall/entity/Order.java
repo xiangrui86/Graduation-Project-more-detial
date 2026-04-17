@@ -63,6 +63,12 @@ public class Order {
     @Column(name = "refund_request_time")
     private LocalDateTime refundRequestTime;
 
+    @Column(name = "refund_reject_reason", length = 256)
+    private String refundRejectReason;
+
+    @Column(name = "refund_reject_time")
+    private LocalDateTime refundRejectTime;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

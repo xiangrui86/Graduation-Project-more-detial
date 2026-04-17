@@ -27,6 +27,9 @@ public class AuthService {
     /** 用户登录：校验账号状态并签发 JWT。 */
     public Map<String, Object> login(String username, String password, String role) {
         Optional<User> opt = userRepository.findByUsername(username);
+        if (opt.isEmpty()) {
+            opt = userRepository.findByPhone(username);
+        }
         if (opt.isEmpty() || !opt.get().getEnabled()) {
             throw new RuntimeException("用户名或密码错误");
         }
@@ -38,11 +41,11 @@ public class AuthService {
         if (!user.getRole().name().equals(role)) {
             throw new RuntimeException("账号角色不匹配，请选择正确的角色登录");
         }
-        // 运营账号需校验运营主体是否启用
+        // 商家账号需校验商家主体是否启用
         if (user.getRole() == Role.MERCHANT && user.getMerchantId() != null) {
             Optional<Merchant> merchantOpt = merchantRepository.findById(user.getMerchantId());
             if (merchantOpt.isEmpty() || !Boolean.TRUE.equals(merchantOpt.get().getEnabled())) {
-                throw new RuntimeException("运营已被禁用，无法登录");
+                throw new RuntimeException("商家已被禁用，无法登录");
             }
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole().name());

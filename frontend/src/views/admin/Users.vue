@@ -13,6 +13,7 @@
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="username" label="用户名" />
       <el-table-column prop="nickname" label="昵称" />
+      <el-table-column prop="phone" label="手机号" width="140" />
       <el-table-column prop="role" label="角色" width="100" />
       <el-table-column prop="enabled" label="启用" width="80">
         <template slot-scope="scope">
@@ -21,12 +22,16 @@
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="openEditDialog(scope.row)"
             >编辑</el-button
           >
-          <el-button type="text" size="small" @click="deleteUser(scope.row.id)"
+          <el-button
+            type="text"
+            size="small"
+            @click="deleteUser(scope.row.id)"
+            v-if="scope.row.role !== 'ADMIN'"
             >删除</el-button
           >
         </template>
@@ -49,11 +54,19 @@
         <el-form-item label="昵称">
           <el-input v-model="form.nickname" />
         </el-form-item>
+        <el-form-item label="手机号">
+          <el-input v-model="form.phone" />
+        </el-form-item>
         <el-form-item label="角色">
-          <el-select v-model="form.role">
+          <el-select v-model="form.role" :disabled="form.role === 'ADMIN'">
             <el-option label="用户" value="USER" />
-            <el-option label="运营" value="MERCHANT" />
-            <el-option label="管理员" value="ADMIN" />
+            <el-option label="商家" value="MERCHANT" />
+            <el-option
+              label="管理员"
+              value="ADMIN"
+              v-if="form.role === 'ADMIN'"
+              disabled
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="启用">
@@ -82,6 +95,7 @@ export default {
         username: "",
         password: "",
         nickname: "",
+        phone: "",
         role: "USER",
         enabled: true,
       },
@@ -103,6 +117,7 @@ export default {
         username: "",
         password: "",
         nickname: "",
+        phone: "",
         role: "USER",
         enabled: true,
       };

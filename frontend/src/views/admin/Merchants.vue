@@ -1,12 +1,12 @@
 <template>
   <div class="page-block">
     <div class="page-title">
-      <h2>运营管理</h2>
-      <span class="sub">运营信息与启用状态</span>
+      <h2>商家管理</h2>
+      <span class="sub">商家信息与启用状态</span>
     </div>
 
     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px">
-      <el-button type="primary" @click="openCreateDialog">新增运营</el-button>
+      <el-button type="primary" @click="openCreateDialog">新增商家</el-button>
     </div>
 
     <el-table :data="list" border>
@@ -42,7 +42,7 @@
     </el-table>
 
     <el-dialog
-      :title="isEdit ? '编辑运营' : '新增运营'"
+      :title="isEdit ? '编辑商家' : '新增商家'"
       :visible.sync="dialogVisible"
       width="500px"
       append-to-body
@@ -150,7 +150,7 @@ export default {
     submitForm() {
       const f = this.form;
       if (!f.name) {
-        this.$message.warning("请填写运营名称");
+        this.$message.warning("请填写商家名称");
         return;
       }
       const payload = this.toMerchantPayload(f);

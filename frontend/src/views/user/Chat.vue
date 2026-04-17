@@ -5,14 +5,28 @@
       <span class="sub">如有疑问请留言，客服会尽快回复</span>
     </div>
     <div class="chat-box">
+      <div class="chat-topbar" v-if="threadList.length > 0">
+        <el-tag
+          v-for="thread in threadList"
+          :key="thread.key"
+          :type="thread.key === selectedThreadKey ? 'success' : 'info'"
+          @click="selectThread(thread.key)"
+          style="cursor: pointer; margin-right: 8px"
+        >
+          {{ thread.label }}
+        </el-tag>
+      </div>
       <div class="msgs">
         <div
-          v-for="m in messages"
+          v-for="m in filteredMessages"
           :key="m.id"
           :class="['msg', m.senderRole === 'USER' ? 'me' : 'other']"
         >
           <span class="role" v-if="m.senderRole === 'MERCHANT'">客服：</span>
           {{ m.content }}
+          <div v-if="m.productName" class="msg-product">
+            商品：{{ m.productName }}
+          </div>
         </div>
       </div>
       <div class="composer">
@@ -38,20 +52,81 @@ export default {
     return {
       messages: [],
       inputMsg: "",
+      selectedThreadKey: null,
+      fixedProductId: null,
     };
   },
   created() {
+    const qPid = this.$route?.query?.productId;
+    const parsed =
+      qPid === undefined || qPid === null || qPid === "" ? null : Number(qPid);
+    this.fixedProductId = Number.isFinite(parsed) ? parsed : null;
     this.loadChat();
+  },
+  computed: {
+    threadList() {
+      const threadsMap = new Map();
+      this.messages.forEach((m) => {
+        const key = m.productId != null ? `product-${m.productId}` : "general";
+        if (!threadsMap.has(key)) {
+          const label = m.productName
+            ? `商品：${m.productName}`
+            : m.productId != null
+            ? `商品ID：${m.productId}`
+            : "通用客服";
+          threadsMap.set(key, { key, label, productId: m.productId });
+        }
+      });
+
+      // 允许从商品页带 productId 进入，但尚无历史消息时也能直接发送给对应商家
+      if (this.fixedProductId != null) {
+        const key = `product-${this.fixedProductId}`;
+        if (!threadsMap.has(key)) {
+          threadsMap.set(key, {
+            key,
+            label: `商品ID：${this.fixedProductId}`,
+            productId: this.fixedProductId,
+          });
+        }
+      }
+
+      const threads = Array.from(threadsMap.values());
+      if (!this.selectedThreadKey && threads.length) {
+        this.selectedThreadKey = threads[0].key;
+      }
+      return threads;
+    },
+    filteredMessages() {
+      if (!this.selectedThreadKey) return this.messages;
+      return this.messages.filter((m) => {
+        if (this.selectedThreadKey === "general") {
+          return m.productId == null;
+        }
+        return `product-${m.productId}` === this.selectedThreadKey;
+      });
+    },
   },
   methods: {
     loadChat() {
-      getUserChatList().then((res) => {
-        if (res.data) this.messages = res.data;
+      const params =
+        this.fixedProductId != null ? { productId: this.fixedProductId } : {};
+      getUserChatList(params).then((res) => {
+        if (res.data) {
+          this.messages = res.data;
+        }
       });
+    },
+    selectThread(key) {
+      this.selectedThreadKey = key;
     },
     send() {
       if (!this.inputMsg.trim()) return;
-      sendUserChat({ content: this.inputMsg }).then((res) => {
+      const selected = this.threadList.find(
+        (thread) => thread.key === this.selectedThreadKey,
+      );
+      const productId =
+        selected && selected.productId ? selected.productId : this.fixedProductId;
+      sendUserChat({ productId, content: this.inputMsg }).then((res) => {
         if (res.code === 200) {
           this.messages.push(res.data);
           this.inputMsg = "";
@@ -93,6 +168,11 @@ export default {
   background: rgba(255, 255, 255, 0.75);
   color: rgba(15, 23, 42, 0.92);
 }
+.chat-topbar {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(249, 250, 251, 0.9);
+}
 .composer {
   display: flex;
   gap: 10px;
@@ -108,5 +188,10 @@ export default {
   color: #2563eb;
   font-weight: 700;
   margin-right: 4px;
+}
+.msg-product {
+  margin-top: 6px;
+  color: rgba(107, 114, 128, 1);
+  font-size: 12px;
 }
 </style>

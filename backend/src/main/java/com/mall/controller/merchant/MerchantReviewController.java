@@ -21,22 +21,22 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/merchant/review")
 @RequiredArgsConstructor
-/** 运营评价管理接口：查看、删除用户评价 */
+/** 商家评价管理接口：查看、删除用户评价 */
 public class MerchantReviewController {
 
     private final ProductReviewRepository productReviewRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    /** 获取当前运营 ID（由登录用户映射）。 */
+    /** 获取当前商家 ID（由登录用户映射）。 */
     private Long currentMerchantId(Authentication auth) {
         Long userId = (Long) auth.getPrincipal();
         User u = userRepository.findById(userId).orElseThrow();
-        if (u.getMerchantId() == null) throw new RuntimeException("非运营账号");
+        if (u.getMerchantId() == null) throw new RuntimeException("非商家账号");
         return u.getMerchantId();
     }
 
-    /** 分页查询当前运营旗下所有商品的评价 */
+    /** 分页查询当前商家旗下所有商品的评价 */
     @GetMapping
     public Result<?> list(
             Authentication auth,
@@ -46,7 +46,7 @@ public class MerchantReviewController {
             @RequestParam(required = false) Integer minRating) {
         Long merchantId = currentMerchantId(auth);
 
-        // 获取该运营的所有商品ID
+        // 获取该商家的所有商品ID
         List<Product> products = productRepository.findByMerchantId(merchantId, PageRequest.of(0, 10000)).getContent();
         List<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toList());
 

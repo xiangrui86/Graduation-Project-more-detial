@@ -30,7 +30,7 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
 
-    /** 按运营从购物车创建订单，并扣减库存。 */
+    /** 按商家从购物车创建订单，并扣减库存。 */
     @Transactional
     public Order createFromCart(Long userId, Long merchantId, String receiverName, String receiverPhone, String receiverAddress) {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
@@ -38,7 +38,7 @@ public class OrderService {
             Optional<Product> p = productRepository.findById(c.getProductId());
             return p.isPresent() && p.get().getMerchantId().equals(merchantId);
         }).toList();
-        if (merchantCart.isEmpty()) throw new RuntimeException("购物车中无该运营商品");
+        if (merchantCart.isEmpty()) throw new RuntimeException("购物车中无该商家商品");
 
         BigDecimal total = BigDecimal.ZERO;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -97,7 +97,36 @@ public class OrderService {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
 
-    /** 分页查询运营订单。 */
+    /** 取消未付款的过期订单。 */
+    @Transactional
+    public void cancelExpiredPendingOrders(int minutes) {
+        var deadline = LocalDateTime.now().minusMinutes(minutes);
+        var expiredOrders = orderRepository.findByStatusAndCreatedAtBefore("PENDING", deadline);
+        for (Order order : expiredOrders) {
+            if (!"CANCELLED".equals(order.getStatus())) {
+                cancelOrderInternal(order);
+            }
+        }
+    }
+
+    /** 取消订单并恢复库存。 */
+    private void cancelOrderInternal(Order o) {
+        if ("CANCELLED".equals(o.getStatus())) {
+            return;
+        }
+        List<OrderItem> items = orderItemRepository.findByOrderId(o.getId());
+        for (OrderItem item : items) {
+            Product p = productRepository.findById(item.getProductId()).orElse(null);
+            if (p == null) continue;
+            int qty = item.getQuantity() == null ? 0 : item.getQuantity();
+            p.setStock((p.getStock() == null ? 0 : p.getStock()) + qty);
+            productRepository.save(p);
+        }
+        o.setStatus("CANCELLED");
+        orderRepository.save(o);
+    }
+
+    /** 分页查询商家订单。 */
     public Page<Order> findByMerchant(Long merchantId, Pageable pageable) {
         return orderRepository.findByMerchantIdOrderByCreatedAtDesc(merchantId, pageable);
     }
@@ -105,6 +134,11 @@ public class OrderService {
     /** 分页查询全站订单。 */
     public Page<Order> findAll(Pageable pageable) {
         return orderRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
+
+    /** 管理端订单查询，支持订单号、状态、用户 ID 和商家 ID 过滤。 */
+    public Page<Order> search(String orderNo, String status, Long userId, Long merchantId, Pageable pageable) {
+        return orderRepository.search(orderNo, status, userId, merchantId, pageable);
     }
 
     /** 查询订单明细项。 */
@@ -131,17 +165,7 @@ public class OrderService {
         if ("CANCELLED".equals(o.getStatus())) {
             throw new RuntimeException("订单已取消");
         }
-
-        List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
-        for (OrderItem item : items) {
-            Product p = productRepository.findById(item.getProductId()).orElse(null);
-            if (p == null) continue;
-            int qty = item.getQuantity() == null ? 0 : item.getQuantity();
-            p.setStock((p.getStock() == null ? 0 : p.getStock()) + qty);
-            productRepository.save(p);
-        }
-        o.setStatus("CANCELLED");
-        orderRepository.save(o);
+        cancelOrderInternal(o);
     }
 
     /**
@@ -181,6 +205,13 @@ public class OrderService {
         item.setRefundRequestTime(LocalDateTime.now());
         orderItemRepository.save(item);
 
+        if (o.getRefundReason() == null) {
+            o.setRefundReason(reason);
+        }
+        if (o.getRefundRequestTime() == null) {
+            o.setRefundRequestTime(LocalDateTime.now());
+        }
+        orderRepository.save(o);
         syncOrderRefundStatus(o, orderId);
     }
 
@@ -235,24 +266,32 @@ public class OrderService {
                 orderItemRepository.save(refundItem);
             }
         }
-
+        if (o.getRefundReason() == null) {
+            o.setRefundReason(reason);
+        }
+        if (o.getRefundRequestTime() == null) {
+            o.setRefundRequestTime(LocalDateTime.now());
+        }
+        orderRepository.save(o);
         syncOrderRefundStatus(o, orderId);
     }
 
     /** 若所有订单项均已申请/已退款，将订单整体同步为 REFUND_REQUESTED。 */
     private void syncOrderRefundStatus(Order o, Long orderId) {
         List<OrderItem> allItems = orderItemRepository.findByOrderId(orderId);
-        boolean allRequested = allItems.stream().allMatch(i ->
+        boolean anyRequested = allItems.stream().anyMatch(i ->
                 "REFUND_REQUESTED".equals(i.getRefundStatus()) || "REFUNDED".equals(i.getRefundStatus()));
-        if (allRequested) {
+        if (anyRequested) {
             o.setStatus("REFUND_REQUESTED");
-            o.setRefundRequestTime(LocalDateTime.now());
+            if (o.getRefundRequestTime() == null) {
+                o.setRefundRequestTime(LocalDateTime.now());
+            }
             orderRepository.save(o);
         }
     }
 
     /**
-     * 运营同意单个订单项退款；如所有项已退款，订单整体标记为 REFUNDED。
+     * 商家同意单个订单项退款；如所有项已退款，订单整体标记为 REFUNDED。
      */
     @Transactional
     public void approveItemRefund(Long orderId, Long itemId, Long merchantId) {
@@ -275,5 +314,30 @@ public class OrderService {
             o.setStatus("REFUNDED");
             orderRepository.save(o);
         }
+    }
+
+    /** 商家拒绝退款：取消退款申请并恢复订单到已收货状态。 */
+    @Transactional
+    public void rejectRefund(Long orderId, Long merchantId) {
+        Order o = orderRepository.findById(orderId).orElseThrow();
+        if (!o.getMerchantId().equals(merchantId)) throw new RuntimeException("订单不存在");
+        if (!"REFUND_REQUESTED".equals(o.getStatus())) {
+            throw new RuntimeException("订单不在退货申请状态");
+        }
+        List<OrderItem> allItems = orderItemRepository.findByOrderId(orderId);
+        for (OrderItem item : allItems) {
+            if ("REFUND_REQUESTED".equals(item.getRefundStatus())) {
+                item.setRefundStatus(null);
+                item.setRefundReason(null);
+                item.setRefundRequestTime(null);
+                orderItemRepository.save(item);
+            }
+        }
+        o.setStatus("RECEIVED");
+        o.setRefundReason(null);
+        o.setRefundRequestTime(null);
+        o.setRefundRejectReason("商家拒绝退款");
+        o.setRefundRejectTime(LocalDateTime.now());
+        orderRepository.save(o);
     }
 }

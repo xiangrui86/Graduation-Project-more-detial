@@ -72,6 +72,8 @@ public class UserOrderController {
             map.put("receiverAddress", order.getReceiverAddress());
             map.put("refundReason", order.getRefundReason());
             map.put("refundRequestTime", order.getRefundRequestTime());
+            map.put("refundRejectReason", order.getRefundRejectReason());
+            map.put("refundRejectTime", order.getRefundRejectTime());
             map.put("createdAt", order.getCreatedAt());
             map.put("updatedAt", order.getUpdatedAt());
             map.put("items", orderService.getItems(order.getId()));

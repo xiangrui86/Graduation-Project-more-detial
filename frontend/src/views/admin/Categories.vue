@@ -22,12 +22,24 @@
       >
         <el-option label="全部父级" :value="null" />
         <el-option label="顶级分类（无父级）" :value="0" />
-        <el-option
-          v-for="c in parentOptions"
-          :key="c.id"
-          :label="c.name"
-          :value="c.id"
-        />
+        <template v-for="group in parentGroups">
+          <el-option
+            :key="'root-' + group.root.id"
+            :label="group.root.name"
+            :value="group.root.id"
+          />
+          <el-option-group
+            :key="'group-' + group.root.id"
+            :label="group.root.name + ' 的子分类'"
+          >
+            <el-option
+              v-for="child in group.children"
+              :key="child.id"
+              :label="child.name"
+              :value="child.id"
+            />
+          </el-option-group>
+        </template>
       </el-select>
       <span class="muted count">共 {{ filteredList.length }} 个</span>
     </div>
@@ -38,7 +50,11 @@
       <el-table-column label="父级" width="180">
         <template slot-scope="scope">
           <span v-if="!scope.row.parentId" class="muted">顶级</span>
-          <span v-else>{{ categoryNameById(scope.row.parentId) }}（{{ scope.row.parentId }}）</span>
+          <span v-else
+            >{{ categoryNameById(scope.row.parentId) }}（{{
+              scope.row.parentId
+            }}）</span
+          >
         </template>
       </el-table-column>
       <el-table-column prop="sortOrder" label="排序" width="100" sortable />
@@ -124,12 +140,39 @@ export default {
       });
       return map;
     },
+    parentGroups() {
+      const roots = (this.list || []).filter((c) => c.parentId == null);
+      return roots.map((root) => ({
+        root,
+        children: (this.list || []).filter(
+          (c) => c.parentId != null && Number(c.parentId) === Number(root.id),
+        ),
+      }));
+    },
     parentOptions() {
-      return (this.list || []).slice().sort((a, b) => (a.id || 0) - (b.id || 0));
+      const roots = (this.list || []).filter((c) => c.parentId == null);
+      const children = (this.list || []).filter((c) => {
+        if (c.parentId == null) return false;
+        const parent = this.list.find(
+          (p) => Number(p.id) === Number(c.parentId),
+        );
+        return parent && parent.parentId == null;
+      });
+      return [...roots, ...children].sort((a, b) => {
+        const sa = Number(a.sortOrder) || 0;
+        const sb = Number(b.sortOrder) || 0;
+        if (sa !== sb) return sa - sb;
+        return (Number(a.id) || 0) - (Number(b.id) || 0);
+      });
     },
     parentOptionsForForm() {
       const currentId = this.isEdit ? this.form.id : null;
-      return this.parentOptions.filter((c) => c && c.id != null && c.id !== currentId);
+      const excludedIds = currentId
+        ? [currentId, ...this.descendantIds(currentId)]
+        : [];
+      return this.parentOptions.filter(
+        (c) => c && c.id != null && !excludedIds.includes(c.id),
+      );
     },
     filteredList() {
       let arr = (this.list || []).slice();
@@ -143,7 +186,10 @@ export default {
       }
       if (this.parentFilter != null) {
         if (this.parentFilter === 0) arr = arr.filter((c) => !c.parentId);
-        else arr = arr.filter((c) => Number(c.parentId) === Number(this.parentFilter));
+        else
+          arr = arr.filter(
+            (c) => Number(c.parentId) === Number(this.parentFilter),
+          );
       }
       arr.sort((a, b) => {
         const sa = Number(a.sortOrder) || 0;
@@ -160,6 +206,19 @@ export default {
   methods: {
     categoryNameById(id) {
       return this.idNameMap[id] || "未知";
+    },
+    descendantIds(categoryId) {
+      const ids = [];
+      const children = (this.list || []).filter(
+        (c) => Number(c.parentId) === Number(categoryId),
+      );
+      children.forEach((child) => {
+        if (child.id != null) {
+          ids.push(child.id);
+          ids.push(...this.descendantIds(child.id));
+        }
+      });
+      return ids;
     },
     loadCategories() {
       getCategories().then((res) => {
@@ -216,20 +275,20 @@ export default {
 </script>
 
 <style scoped>
-.toolbar{
-  display:flex;
+.toolbar {
+  display: flex;
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 12px;
 }
-.search{
+.search {
   width: 240px;
 }
-.parent{
+.parent {
   width: 240px;
 }
-.count{
+.count {
   margin-left: auto;
 }
 </style>
