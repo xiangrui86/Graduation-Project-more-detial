@@ -12,6 +12,8 @@ import java.util.Optional;
 /** 商品仓储：封装管理端与公开端商品查询。 */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    List<Product> findByMerchantId(Long merchantId);
+
     Page<Product> findByMerchantId(Long merchantId, Pageable pageable);
 
     Page<Product> findByOnSaleTrue(Pageable pageable);

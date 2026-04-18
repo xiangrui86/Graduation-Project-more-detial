@@ -162,9 +162,7 @@ public class MerchantProductController {
         product.setImage(request.getImage());
         product.setDetailImages(detailImages);
         product.setIsNew(request.getIsNew() != null ? request.getIsNew() : false);
-        product.setOnSale(false);
-        product.setReviewStatus("PENDING");
-        product.setReviewReason(null);
+        // 商家编辑商品不应自动“全量下架”。是否需要重新审核由管理员侧审核流程决定。
         
         return Result.ok(productService.save(product));
     }

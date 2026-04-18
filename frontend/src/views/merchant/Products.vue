@@ -161,15 +161,27 @@ export default {
       this.loading = true;
       getProducts({ page, size: this.pageSize })
         .then((res) => {
+          if (!res || res.code !== 200) {
+            this.list = [];
+            this.total = 0;
+            this.$message.error((res && res.message) || "加载商品失败");
+            return;
+          }
+
           if (res.data && res.data.content) {
             this.list = res.data.content;
             this.total = res.data.totalElements || 0;
           } else if (Array.isArray(res.data)) {
             this.list = res.data;
             this.total = res.data.length;
+          } else {
+            this.list = [];
+            this.total = 0;
           }
         })
         .catch((err) => {
+          this.list = [];
+          this.total = 0;
           this.$message.error("加载商品失败");
           console.error(err);
         })
@@ -207,18 +219,22 @@ export default {
     async handleProductSubmit(formData) {
       try {
         if (this.editingProduct) {
-          await updateProduct(this.editingProduct.id, formData);
+          const res = await updateProduct(this.editingProduct.id, formData);
+          if (res.code !== 200) throw new Error(res.message || "操作失败");
           this.$message.success("商品编辑成功");
         } else {
-          await createProduct(formData);
+          const res = await createProduct(formData);
+          if (res.code !== 200) throw new Error(res.message || "操作失败");
           this.$message.success("商品上架成功");
         }
         this.showCreateDialog = false;
         this.loadProducts(this.currentPage - 1);
       } catch (error) {
-        this.$message.error(
-          error.response?.data?.message || "操作失败，请重试",
-        );
+        const msg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "操作失败，请重试";
+        this.$message.error(msg);
       }
     },
 
@@ -241,11 +257,16 @@ export default {
       })
         .then(async () => {
           try {
-            await deleteProduct(id);
+            const res = await deleteProduct(id);
+            if (res.code !== 200) {
+              this.$message.error(res.message || "删除失败");
+              return;
+            }
             this.$message.success("删除成功");
             this.loadProducts(this.currentPage - 1);
           } catch (error) {
-            this.$message.error("删除失败");
+            const msg = error?.response?.data?.message || "删除失败";
+            this.$message.error(msg);
           }
         })
         .catch(() => {});

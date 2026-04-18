@@ -70,7 +70,7 @@ public class ProductService {
 
     /** 商家维度商品查询。 */
     public Page<Product> listByMerchant(Long merchantId, Pageable pageable) {
-        return productRepository.findByMerchantIdAndOnSaleTrue(merchantId, pageable);
+        return productRepository.findByMerchantId(merchantId, pageable);
     }
 
     /** 新品列表。 */

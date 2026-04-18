@@ -2,7 +2,7 @@
   <div class="page-block">
     <div class="page-title">
       <h2>商品详情管理</h2>
-      <span class="sub">编辑商品详情、管理规格和款式</span>
+      <span class="sub">编辑商品详情和款式</span>
     </div>
 
     <!-- 返回列表按钮 -->
@@ -118,159 +118,12 @@
           </el-form>
         </div>
       </el-tab-pane>
-
-      <!-- 规格管理 -->
-      <el-tab-pane label="规格管理" name="specs">
-        <div style="margin-top: 20px">
-          <div style="margin-bottom: 12px">
-            <el-button type="primary" @click="showSpecDialog = true">
-              + 添加规格
-            </el-button>
-          </div>
-          <el-table :data="specs" border>
-            <el-table-column prop="specName" label="规格名称" width="120" />
-            <el-table-column prop="specValue" label="规格值" width="120" />
-            <el-table-column prop="stock" label="库存" width="80" />
-            <el-table-column prop="priceDelta" label="价格差" width="100">
-              <template slot-scope="scope">
-                <span v-if="scope.row.priceDelta">
-                  +￥{{ scope.row.priceDelta.toFixed(2) }}
-                </span>
-                <span v-else>无</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="enabled" label="启用" width="80">
-              <template slot-scope="scope">
-                <el-tag :type="scope.row.enabled ? 'success' : 'info'">
-                  {{ scope.row.enabled ? "是" : "否" }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="图片" width="100">
-              <template slot-scope="scope">
-                <img
-                  v-if="scope.row.image"
-                  :src="scope.row.image"
-                  style="max-width: 60px; max-height: 60px; border-radius: 4px"
-                />
-                <span v-else style="color: #909399">无</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="150">
-              <template slot-scope="scope">
-                <el-button
-                  type="text"
-                  size="small"
-                  @click="editSpec(scope.row)"
-                >
-                  编辑
-                </el-button>
-                <el-button
-                  type="text"
-                  size="small"
-                  @click="deleteSpec(scope.row.id)"
-                >
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-      </el-tab-pane>
     </el-tabs>
-
-    <!-- 规格编辑对话框 -->
-    <el-dialog
-      :title="editingSpecId ? '编辑规格' : '添加规格'"
-      :visible.sync="showSpecDialog"
-      width="500px"
-      @close="resetSpecForm"
-      :append-to-body="true"
-    >
-      <el-form :model="specForm" label-width="100px">
-        <el-form-item label="规格名称">
-          <el-input
-            v-model="specForm.specName"
-            placeholder="如: 颜色, 尺码, 容量"
-          />
-        </el-form-item>
-        <el-form-item label="规格值">
-          <el-input
-            v-model="specForm.specValue"
-            placeholder="如: 红色, M, 128GB"
-          />
-        </el-form-item>
-        <el-form-item label="库存">
-          <el-input
-            v-model.number="specForm.stock"
-            type="number"
-            placeholder="此规格的库存数量"
-          />
-        </el-form-item>
-        <el-form-item label="价格差">
-          <el-input
-            v-model.number="specForm.priceDelta"
-            type="number"
-            step="0.01"
-            placeholder="在基础价格上增加的金额（可为负）"
-          />
-        </el-form-item>
-        <el-form-item label="排序">
-          <el-input
-            v-model.number="specForm.sortOrder"
-            type="number"
-            placeholder="显示顺序"
-          />
-        </el-form-item>
-        <el-form-item label="规格图片">
-          <div style="display: flex; gap: 10px; align-items: flex-start">
-            <div style="flex: 1">
-              <el-input v-model="specForm.image" placeholder="规格图片URL" />
-            </div>
-            <el-upload
-              :auto-upload="true"
-              accept="image/*"
-              :on-success="handleSpecImgUploadSuccess"
-              :on-error="handleUploadError"
-              action="/api/pub/images/upload"
-              :show-file-list="false"
-            >
-              <el-button type="primary" size="small">上传</el-button>
-            </el-upload>
-          </div>
-          <div v-if="specForm.image" style="margin-top: 10px">
-            <img
-              :src="specForm.image"
-              style="max-width: 150px; max-height: 150px; border-radius: 4px"
-            />
-          </div>
-          <div style="font-size: 12px; color: #909399; margin-top: 5px">
-            支持多图上传，拖拽排序，首图为主图
-          </div>
-        </el-form-item>
-        <el-form-item label="启用">
-          <el-switch v-model="specForm.enabled" />
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-        <el-button @click="showSpecDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveSpec" :loading="specSaving">
-          保存
-        </el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  getProduct,
-  updateProduct,
-  getProductSpecs,
-  createProductSpec,
-  updateProductSpec,
-  deleteProductSpec,
-} from "@/api/merchant";
+import { getProduct, updateProduct } from "@/api/merchant";
 
 export default {
   name: "MerchantProductDetail",
@@ -287,19 +140,6 @@ export default {
       },
       detailImages: [],
       detailSaving: false,
-      specs: [],
-      showSpecDialog: false,
-      editingSpecId: null,
-      specSaving: false,
-      specForm: {
-        specName: "",
-        specValue: "",
-        stock: 0,
-        priceDelta: 0,
-        image: "",
-        sortOrder: 0,
-        enabled: true,
-      },
     };
   },
   created() {
@@ -309,7 +149,6 @@ export default {
       return;
     }
     this.loadProductDetail();
-    this.loadSpecs();
   },
   methods: {
     loadProductDetail() {
@@ -331,13 +170,6 @@ export default {
         })
         .catch(() => this.$message.error("加载商品详情失败"));
     },
-    loadSpecs() {
-      getProductSpecs(this.productId)
-        .then((res) => {
-          this.specs = res.data || [];
-        })
-        .catch(() => this.$message.error("加载规格列表失败"));
-    },
     saveDetail() {
       this.detailSaving = true;
       const data = {
@@ -356,81 +188,9 @@ export default {
           this.detailSaving = false;
         });
     },
-    editSpec(spec) {
-      this.editingSpecId = spec.id;
-      this.specForm = { ...spec };
-      this.showSpecDialog = true;
-    },
-    saveSpec() {
-      if (!this.specForm.specName) {
-        this.$message.error("请输入规格名称");
-        return;
-      }
-      if (!this.specForm.specValue) {
-        this.$message.error("请输入规格值");
-        return;
-      }
-      if (this.specForm.stock === null || this.specForm.stock === "") {
-        this.$message.error("请输入库存");
-        return;
-      }
-      this.specSaving = true;
-      const promise = this.editingSpecId
-        ? updateProductSpec(this.editingSpecId, this.specForm)
-        : createProductSpec(this.productId, this.specForm);
-
-      promise
-        .then(() => {
-          this.$message.success(
-            this.editingSpecId ? "规格更新成功" : "规格添加成功",
-          );
-          this.showSpecDialog = false;
-          this.loadSpecs();
-        })
-        .catch((e) => {
-          this.$message.error(e.response?.data?.message || "操作失败");
-        })
-        .finally(() => {
-          this.specSaving = false;
-        });
-    },
-    async deleteSpec(specId) {
-      this.$confirm("确定删除该规格吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          deleteProductSpec(specId)
-            .then(() => {
-              this.$message.success("删除成功");
-              this.loadSpecs();
-            })
-            .catch(() => this.$message.error("删除失败"));
-        })
-        .catch(() => {});
-    },
-    resetSpecForm() {
-      this.editingSpecId = null;
-      this.specForm = {
-        specName: "",
-        specValue: "",
-        stock: 0,
-        priceDelta: 0,
-        image: "",
-        sortOrder: 0,
-        enabled: true,
-      };
-    },
     handleDetailImgUploadSuccess(response) {
       if (response.code === 200 && response.data) {
         this.detailImages.push(response.data.url);
-        this.$message.success("图片上传成功");
-      }
-    },
-    handleSpecImgUploadSuccess(response) {
-      if (response.code === 200 && response.data) {
-        this.specForm.image = response.data.url;
         this.$message.success("图片上传成功");
       }
     },
@@ -444,7 +204,7 @@ export default {
       if (status === "REJECTED") return "已拒绝";
       return "待审核";
     },
-    handleUploadError(err) {
+    handleUploadError() {
       this.$message.error("图片上传失败");
     },
   },

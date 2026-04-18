@@ -3,8 +3,10 @@ package com.mall.controller.admin;
 import com.mall.common.Role;
 import com.mall.dto.Result;
 import com.mall.entity.Merchant;
+import com.mall.entity.Product;
 import com.mall.entity.User;
 import com.mall.repository.MerchantRepository;
+import com.mall.repository.ProductRepository;
 import com.mall.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ public class AdminMerchantController {
 
     private final MerchantRepository merchantRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     /** 查询商家列表，并附带所属商家账号信息。 */
     @GetMapping
@@ -117,5 +120,27 @@ public class AdminMerchantController {
     public Result<?> delete(@PathVariable Long id) {
         merchantRepository.deleteById(id);
         return Result.ok(null);
+    }
+
+    /**
+     * 恢复该商家名下商品：批量设为“审核通过 + 上架”。
+     * 用于误操作/数据异常导致商品被统一下架的应急恢复。
+     */
+    @PostMapping("/{id}/restore-products")
+    public Result<?> restoreProducts(@PathVariable Long id) {
+        Optional<Merchant> mOpt = merchantRepository.findById(id);
+        if (mOpt.isEmpty()) return Result.fail("商家不存在");
+
+        List<Product> products = productRepository.findByMerchantId(id);
+        if (products == null || products.isEmpty()) {
+            return Result.ok(0);
+        }
+        for (Product p : products) {
+            p.setReviewStatus("APPROVED");
+            p.setReviewReason(null);
+            p.setOnSale(true);
+        }
+        productRepository.saveAll(products);
+        return Result.ok(products.size());
     }
 }
