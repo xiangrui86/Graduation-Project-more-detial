@@ -17,7 +17,6 @@
       v-loading="loading"
       class="banner-table"
     >
-      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="imageUrl" label="图片预览" width="120">
         <template slot-scope="scope">
           <img

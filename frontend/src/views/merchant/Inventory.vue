@@ -128,7 +128,6 @@
               <div class="product-details">
                 <div class="product-name">{{ scope.row.name }}</div>
                 <div class="product-meta">
-                  <span class="product-id">ID: {{ scope.row.id }}</span>
                   <span class="product-price">¥{{ scope.row.price }}</span>
                 </div>
               </div>

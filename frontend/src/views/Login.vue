@@ -470,12 +470,15 @@ export default {
           avatar: res.data.avatar,
           gender: res.data.gender,
           merchantId: res.data.merchantId,
+          merchantName: res.data.merchantName,
         });
 
         // 登录成功提示
-        this.$message.success(
-          `欢迎回来，${res.data.nickname || res.data.username}！`,
-        );
+        let welcomeName = res.data.nickname || res.data.username;
+        if (res.data.role === "MERCHANT" && res.data.merchantName) {
+          welcomeName = res.data.merchantName;
+        }
+        this.$message.success(`欢迎回来，${welcomeName}！`);
 
         // 短暂延迟后跳转
         setTimeout(() => {

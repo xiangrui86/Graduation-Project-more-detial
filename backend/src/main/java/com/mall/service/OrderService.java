@@ -136,9 +136,9 @@ public class OrderService {
         return orderRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
-    /** 管理端订单查询，支持订单号、状态、用户 ID 和商家 ID 过滤。 */
-    public Page<Order> search(String orderNo, String status, Long userId, Long merchantId, Pageable pageable) {
-        return orderRepository.search(orderNo, status, userId, merchantId, pageable);
+    /** 管理端订单查询，支持订单号、状态、用户 ID、商家 ID 和日期范围过滤。 */
+    public Page<Order> search(String orderNo, String status, Long userId, Long merchantId, String startDate, String endDate, Pageable pageable) {
+        return orderRepository.search(orderNo, status, userId, merchantId, startDate, endDate, pageable);
     }
 
     /** 查询订单明细项。 */

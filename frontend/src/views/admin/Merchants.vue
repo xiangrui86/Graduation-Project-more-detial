@@ -10,7 +10,6 @@
     </div>
 
     <el-table :data="list" border>
-      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="名称" />
       <el-table-column label="所属用户" min-width="160">
         <template slot-scope="scope">
@@ -52,11 +51,18 @@
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item label="所属用户">
-          <el-select v-model="form.ownerUserId" filterable clearable style="width: 100%">
+          <el-select
+            v-model="form.ownerUserId"
+            filterable
+            clearable
+            style="width: 100%"
+          >
             <el-option
               v-for="u in merchantUsers"
               :key="u.id"
-              :label="u.nickname ? `${u.username}（${u.nickname}）` : u.username"
+              :label="
+                u.nickname ? `${u.username}（${u.nickname}）` : u.username
+              "
               :value="u.id"
             />
           </el-select>
@@ -120,12 +126,18 @@ export default {
     loadMerchantUsers() {
       getUsers({ role: "MERCHANT" }).then((res) => {
         if (Array.isArray(res.data)) this.merchantUsers = res.data;
-        else if (res.data && res.data.content) this.merchantUsers = res.data.content;
+        else if (res.data && res.data.content)
+          this.merchantUsers = res.data.content;
       });
     },
     openCreateDialog() {
       this.isEdit = false;
-      this.form = { name: "", ownerUserId: null, description: "", enabled: true };
+      this.form = {
+        name: "",
+        ownerUserId: null,
+        description: "",
+        enabled: true,
+      };
       this.dialogVisible = true;
     },
     openEditDialog(row) {

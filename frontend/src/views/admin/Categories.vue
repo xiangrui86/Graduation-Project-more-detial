@@ -45,7 +45,6 @@
     </div>
 
     <el-table :data="filteredList" border>
-      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="名称" />
       <el-table-column label="父级" width="180">
         <template slot-scope="scope">

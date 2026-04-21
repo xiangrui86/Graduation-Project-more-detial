@@ -405,11 +405,24 @@ export default {
     updateQty(productId, v) {
       if (v < 1) return;
       const item = this.items.find(it => it.productId === productId);
+      if (!item) return;
+
+      // 乐观更新：先更新本地数据
+      const oldQty = item.quantity;
+      item.quantity = v;
+
+      // 发送请求
       updateCartQuantity({ 
         productId, 
-        specId: item?.specId,
+        specId: item.specId,
         quantity: v 
-      }).then(() => this.load());
+      }).then(() => {
+        // 成功，不需要额外操作
+      }).catch(() => {
+        // 失败，回滚到旧数量
+        item.quantity = oldQty;
+        this.$message.error("更新数量失败，请重试");
+      });
     },
     confirmRemove(productId) {
       const item = this.items.find(it => it.productId === productId);

@@ -34,7 +34,6 @@
       style="width: 100%"
       :default-sort="{ prop: 'createdAt', order: 'descending' }"
     >
-      <el-table-column prop="id" label="ID" width="60" align="center" />
       <el-table-column prop="title" label="标题" min-width="200" />
       <el-table-column prop="type" label="类型" width="100" align="center">
         <template slot-scope="scope">

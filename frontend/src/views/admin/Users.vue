@@ -10,8 +10,6 @@
     </div>
 
     <el-table :data="list" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="username" label="用户名" />
       <el-table-column prop="nickname" label="昵称" />
       <el-table-column prop="phone" label="手机号" width="140" />
       <el-table-column prop="role" label="角色" width="100" />
@@ -50,6 +48,13 @@
         </el-form-item>
         <el-form-item label="密码" v-if="!isEdit">
           <el-input v-model="form.password" type="password" />
+        </el-form-item>
+        <el-form-item label="新密码" v-if="isEdit">
+          <el-input
+            v-model="form.password"
+            type="password"
+            placeholder="留空表示不修改密码"
+          />
         </el-form-item>
         <el-form-item label="昵称">
           <el-input v-model="form.nickname" />
@@ -126,6 +131,7 @@ export default {
     openEditDialog(row) {
       this.isEdit = true;
       this.form = { ...row };
+      this.form.password = ""; // 清空密码字段
       this.dialogVisible = true;
     },
     submitForm() {
@@ -134,7 +140,15 @@ export default {
         this.$message.warning("请填写必填项");
         return;
       }
-      const promise = this.isEdit ? updateUser(f.id, f) : createUser(f);
+      // 准备提交的数据
+      const submitData = { ...f };
+      if (this.isEdit && (!f.password || f.password.trim() === "")) {
+        // 编辑时如果密码为空，不发送密码字段
+        delete submitData.password;
+      }
+      const promise = this.isEdit
+        ? updateUser(f.id, submitData)
+        : createUser(submitData);
       promise.then((res) => {
         if (res.code === 200) {
           this.$message.success(this.isEdit ? "更新成功" : "创建成功");

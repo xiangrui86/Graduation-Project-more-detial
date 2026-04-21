@@ -471,6 +471,12 @@ export default {
   created() {
     this.loadProductData(this.$route.params.id);
   },
+  mounted() {
+    // 页面加载时滚动到顶部
+    this.$nextTick(() => {
+      window.scrollTo(0, 0);
+    });
+  },
   methods: {
     loadProductData(id) {
       getProduct(id).then((res) => {
@@ -531,7 +537,10 @@ export default {
         return;
       }
       if (!this.product || !this.product.id) return;
-      this.$router.push({ path: "/chat", query: { productId: this.product.id } });
+      this.$router.push({
+        path: "/chat",
+        query: { productId: this.product.id },
+      });
     },
     sendContactMessage() {
       if (!this.contactMessage.trim()) {

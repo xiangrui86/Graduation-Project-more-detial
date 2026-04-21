@@ -81,15 +81,29 @@
       >
         <el-table-column type="selection" width="50" />
 
-        <el-table-column label="商品ID" width="80">
+        <el-table-column label="商品" min-width="150">
           <template slot-scope="scope">
-            {{ scope.row.productId }}
+            <div class="product-info">
+              <img
+                v-if="scope.row.productImage"
+                :src="scope.row.productImage"
+                class="product-thumb"
+                alt="商品图片"
+              />
+              <div class="product-text">
+                <div class="product-name">{{ scope.row.productName }}</div>
+                <div class="product-price">¥{{ scope.row.productPrice }}</div>
+              </div>
+            </div>
           </template>
         </el-table-column>
 
-        <el-table-column label="用户ID" width="100">
+        <el-table-column label="用户" width="120">
           <template slot-scope="scope">
-            {{ scope.row.userId }}
+            <div class="user-info">
+              <div class="user-name">{{ scope.row.userNickname }}</div>
+              <div class="user-username">@{{ scope.row.userUsername }}</div>
+            </div>
           </template>
         </el-table-column>
 
@@ -392,6 +406,54 @@ export default {
 .review-content {
   color: #6b7280;
   cursor: pointer;
+}
+
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-text {
+  flex: 1;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.product-price {
+  font-size: 12px;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.user-info {
+  text-align: center;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.user-username {
+  font-size: 12px;
+  color: #6b7280;
 }
 
 .pagination-wrapper {

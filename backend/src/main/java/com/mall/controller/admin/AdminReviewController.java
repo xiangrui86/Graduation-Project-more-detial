@@ -1,15 +1,21 @@
 package com.mall.controller.admin;
 
 import com.mall.dto.Result;
+import com.mall.entity.Product;
 import com.mall.entity.ProductReview;
+import com.mall.entity.User;
+import com.mall.repository.ProductRepository;
 import com.mall.repository.ProductReviewRepository;
+import com.mall.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,6 +26,8 @@ import java.util.stream.Collectors;
 public class AdminReviewController {
 
     private final ProductReviewRepository productReviewRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     /** 分页查询所有评价 */
     @GetMapping
@@ -59,7 +67,46 @@ public class AdminReviewController {
         int end = Math.min(start + size, allReviews.size());
         List<ProductReview> pageContent = allReviews.subList(start, end);
 
-        Page<ProductReview> result = new PageImpl<>(pageContent, PageRequest.of(page, size), allReviews.size());
+        // 转换为包含商品和用户信息的数据
+        List<Map<String, Object>> enrichedReviews = pageContent.stream()
+                .map(review -> {
+                    Map<String, Object> reviewData = new HashMap<>();
+                    reviewData.put("id", review.getId());
+                    reviewData.put("productId", review.getProductId());
+                    reviewData.put("userId", review.getUserId());
+                    reviewData.put("rating", review.getRating());
+                    reviewData.put("content", review.getContent());
+                    reviewData.put("createdAt", review.getCreatedAt());
+
+                    // 获取商品信息
+                    Optional<Product> productOpt = productRepository.findById(review.getProductId());
+                    if (productOpt.isPresent()) {
+                        Product product = productOpt.get();
+                        reviewData.put("productName", product.getName());
+                        reviewData.put("productImage", product.getImage());
+                        reviewData.put("productPrice", product.getPrice());
+                    } else {
+                        reviewData.put("productName", "商品已删除");
+                        reviewData.put("productImage", null);
+                        reviewData.put("productPrice", 0.0);
+                    }
+
+                    // 获取用户信息
+                    Optional<User> userOpt = userRepository.findById(review.getUserId());
+                    if (userOpt.isPresent()) {
+                        User user = userOpt.get();
+                        reviewData.put("userUsername", user.getUsername());
+                        reviewData.put("userNickname", user.getNickname());
+                    } else {
+                        reviewData.put("userUsername", "用户已删除");
+                        reviewData.put("userNickname", "用户已删除");
+                    }
+
+                    return reviewData;
+                })
+                .collect(Collectors.toList());
+
+        Page<Map<String, Object>> result = new PageImpl<>(enrichedReviews, PageRequest.of(page, size), allReviews.size());
         return Result.ok(result);
     }
 

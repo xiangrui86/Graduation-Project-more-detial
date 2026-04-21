@@ -25,9 +25,11 @@
             <div class="row">
               <div class="name">
                 <el-tag size="mini" type="info" style="margin-right: 8px"
-                  >用户 {{ t.userId }}</el-tag
+                  >用户</el-tag
                 >
-                <span class="product">{{ t.productName || `商品ID：${t.productId}` }}</span>
+                <span class="product">{{
+                  t.productName || `商品ID：${t.productId}`
+                }}</span>
               </div>
               <div class="time">{{ formatDate(t.lastAt) }}</div>
             </div>
@@ -45,12 +47,11 @@
           <div class="meta">
             <div>
               <span class="meta-label">当前会话：</span>
-              <el-tag size="mini" type="success"
-                >用户 {{ selectedThread.userId }}</el-tag
-              >
-              <el-tag size="mini" style="margin-left: 8px"
-                >{{ selectedThread.productName || `商品ID：${selectedThread.productId}` }}</el-tag
-              >
+              <el-tag size="mini" type="success">用户</el-tag>
+              <el-tag size="mini" style="margin-left: 8px">{{
+                selectedThread.productName ||
+                `商品ID：${selectedThread.productId}`
+              }}</el-tag>
             </div>
             <el-button size="mini" @click="refresh">刷新</el-button>
           </div>
@@ -140,7 +141,9 @@ export default {
       const { productId, userId } = this.selectedThread;
       return this.allMessages
         .filter((m) => m.productId === productId && m.userId === userId)
-        .sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+        .sort(
+          (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
+        );
     },
   },
   methods: {
@@ -332,4 +335,3 @@ export default {
   }
 }
 </style>
-

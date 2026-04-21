@@ -22,17 +22,19 @@ public class AdminOrderController {
 
     private final OrderService orderService;
 
-    /** 分页查询全站订单，支持按订单号、状态、用户ID、商家ID过滤。 */
+    /** 分页查询全站订单，支持按订单号、状态、用户ID、商家ID、日期范围过滤。 */
     @GetMapping
     public ResponseEntity<Result<?>> list(
             @RequestParam(required = false) String orderNo,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long merchantId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(Result.ok(
-                orderService.search(orderNo, status, userId, merchantId, PageRequest.of(page, size))));
+                orderService.search(orderNo, status, userId, merchantId, startDate, endDate, PageRequest.of(page, size))));
     }
 
     /** 查询订单详情（含订单项）。 */

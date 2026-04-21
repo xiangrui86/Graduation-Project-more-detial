@@ -65,7 +65,7 @@ public class AdminUserController {
         return ResponseEntity.ok(Result.ok(u));
     }
 
-    /** 更新用户基础信息（昵称、状态、商家绑定）。 */
+    /** 更新用户基础信息（昵称、状态、商家绑定、密码）。 */
     @PutMapping("/{id}")
     public ResponseEntity<Result<?>> update(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Optional<User> opt = userRepository.findById(id);
@@ -75,6 +75,12 @@ public class AdminUserController {
         if (body.containsKey("phone")) u.setPhone((String) body.get("phone"));
         if (body.containsKey("enabled")) u.setEnabled((Boolean) body.get("enabled"));
         if (body.containsKey("merchantId")) u.setMerchantId(body.get("merchantId") != null ? Long.valueOf(body.get("merchantId").toString()) : null);
+        if (body.containsKey("password") && body.get("password") != null) {
+            String newPassword = body.get("password").toString();
+            if (!newPassword.isBlank()) {
+                u.setPassword(passwordEncoder.encode(newPassword));
+            }
+        }
         userRepository.save(u);
         return ResponseEntity.ok(Result.ok(u));
     }

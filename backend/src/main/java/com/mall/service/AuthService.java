@@ -41,13 +41,7 @@ public class AuthService {
         if (!user.getRole().name().equals(role)) {
             throw new RuntimeException("账号角色不匹配，请选择正确的角色登录");
         }
-        // 商家账号需校验商家主体是否启用
-        if (user.getRole() == Role.MERCHANT && user.getMerchantId() != null) {
-            Optional<Merchant> merchantOpt = merchantRepository.findById(user.getMerchantId());
-            if (merchantOpt.isEmpty() || !Boolean.TRUE.equals(merchantOpt.get().getEnabled())) {
-                throw new RuntimeException("商家已被禁用，无法登录");
-            }
-        }
+
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole().name());
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
@@ -58,6 +52,17 @@ public class AuthService {
         result.put("avatar", user.getAvatar());
         result.put("gender", user.getGender());
         result.put("merchantId", user.getMerchantId());
+
+        // 商家账号需校验商家主体是否启用，并添加商家名称
+        if (user.getRole() == Role.MERCHANT && user.getMerchantId() != null) {
+            Optional<Merchant> merchantOpt = merchantRepository.findById(user.getMerchantId());
+            if (merchantOpt.isEmpty() || !Boolean.TRUE.equals(merchantOpt.get().getEnabled())) {
+                throw new RuntimeException("商家已被禁用，无法登录");
+            }
+            // 返回商家名称
+            result.put("merchantName", merchantOpt.get().getName());
+        }
+
         return result;
     }
 

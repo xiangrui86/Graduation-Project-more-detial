@@ -22,7 +22,6 @@
       v-loading="loading"
       class="product-table"
     >
-      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column label="商品信息" min-width="200">
         <template slot-scope="scope">
           <div class="product-info">

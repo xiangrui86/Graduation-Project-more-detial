@@ -25,13 +25,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "(:orderNo IS NULL OR o.orderNo LIKE %:orderNo%) AND " +
             "(:status IS NULL OR o.status = :status) AND " +
             "(:userId IS NULL OR o.userId = :userId) AND " +
-            "(:merchantId IS NULL OR o.merchantId = :merchantId) " +
+            "(:merchantId IS NULL OR o.merchantId = :merchantId) AND " +
+            "(:startDate IS NULL OR DATE(o.createdAt) >= DATE(:startDate)) AND " +
+            "(:endDate IS NULL OR DATE(o.createdAt) <= DATE(:endDate)) " +
             "ORDER BY o.createdAt DESC")
     Page<Order> search(
             @Param("orderNo") String orderNo,
             @Param("status") String status,
             @Param("userId") Long userId,
             @Param("merchantId") Long merchantId,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate,
             Pageable pageable);
 
     List<Order> findByUserIdAndStatus(Long userId, String status);
